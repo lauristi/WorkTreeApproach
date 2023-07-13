@@ -1,6 +1,6 @@
-﻿namespace WorkTree.DTO
+﻿namespace WorkTree.Database.DTO.Response
 {
-    public abstract class JobItemChildDTO
+    public abstract class JobItemChildResponseDTO
     {
         public Guid Id { get; set; }
         public Guid JobId { get; set; }

@@ -1,12 +1,12 @@
 ﻿using WorkTree.Database.Models;
 
-namespace WorkTree.Repositories.Interface
+namespace WorkTree.Business.Interface
 {
-    public interface IJobItemRepository
+    public interface IJobItemBLL
     {
-        Task<JobItem> Get(Guid id);
-
         Task<IEnumerable<JobItem>> GetAll();
+
+        Task<JobItem> Get(Guid id);
 
         Guid Insert(JobItem jobItem);
 
@@ -16,9 +16,9 @@ namespace WorkTree.Repositories.Interface
 
         //--------------------------------------
 
-        Task<JobItemChild> GetChild(Guid id);
-
         Task<IEnumerable<JobItemChild>> GetAllChild();
+
+        Task<JobItemChild> GetChild(Guid id);
 
         Guid InsertChild(JobItemChild jobItemChild);
 

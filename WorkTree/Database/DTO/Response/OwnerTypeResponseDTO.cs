@@ -1,6 +1,6 @@
-﻿namespace WorkTree.DTO
+﻿namespace WorkTree.Database.DTO.Response
 {
-    public class ItemTypeDTO
+    public class OwnerTypeResponseDTO
     {
         public Guid Id { get; set; }
         public string Description { get; set; }

@@ -1,26 +1,34 @@
-﻿using WorkTree.Database.Models;
+﻿using WorkTree.Business.Interface;
+using WorkTree.Database.Models;
 using WorkTree.Repositories.Interface;
 
-namespace WorkTree.Repositories
+namespace WorkTree.Business
 {
-    public class JobItemRepository : IJobItemRepository
+    public class BaseItemBLL : IBaseItemBLL
     {
-        public Task<IEnumerable<JobItem>> GetAll()
+        private readonly IBaseItemRepository _baseItemRepository;
+
+        public BaseItemBLL(IBaseItemRepository baseItemRepository)
+        {
+            _baseItemRepository = baseItemRepository;
+        }
+
+        public Task<IEnumerable<BaseItem>> GetAll()
         {
             throw new NotImplementedException();
         }
 
-        public Task<JobItem> Get(Guid id)
+        public Task<BaseItem> Get(Guid id)
         {
             throw new NotImplementedException();
         }
 
-        public Guid Insert(JobItem jobItem)
+        public Guid Insert(BaseItem baseItem)
         {
             throw new NotImplementedException();
         }
 
-        public void Update(JobItem jobItem)
+        public void Update(BaseItem baseItem)
         {
             throw new NotImplementedException();
         }
@@ -32,22 +40,22 @@ namespace WorkTree.Repositories
 
         #region Child
 
-        public Task<IEnumerable<JobItemChild>> GetAllChild()
+        public Task<IEnumerable<BaseItemChild>> GetAllChild()
         {
             throw new NotImplementedException();
         }
 
-        public Task<JobItemChild> GetChild(Guid id)
+        public Task<BaseItemChild> GetChild(Guid id)
         {
             throw new NotImplementedException();
         }
 
-        public Guid InsertChild(JobItemChild jobItemChild)
+        public Guid InsertChild(BaseItemChild baseItemChild)
         {
             throw new NotImplementedException();
         }
 
-        public void UpdateChild(JobItemChild jobItemChild)
+        public void UpdateChild(BaseItemChild baseItemChild)
         {
             throw new NotImplementedException();
         }

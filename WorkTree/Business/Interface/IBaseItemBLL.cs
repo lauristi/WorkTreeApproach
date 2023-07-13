@@ -1,12 +1,12 @@
 ﻿using WorkTree.Database.Models;
 
-namespace WorkTree.Repositories.Interface
+namespace WorkTree.Business.Interface
 {
-    public interface IBaseItemRepository
+    public interface IBaseItemBLL
     {
-        Task<BaseItem> Get(Guid id);
-
         Task<IEnumerable<BaseItem>> GetAll();
+
+        Task<BaseItem> Get(Guid id);
 
         Guid Insert(BaseItem baseItem);
 
@@ -15,9 +15,10 @@ namespace WorkTree.Repositories.Interface
         void Delete(Guid id);
 
         //-------------------------------------------------
-        Task<BaseItemChild> GetChild(Guid id);
 
         Task<IEnumerable<BaseItemChild>> GetAllChild();
+
+        Task<BaseItemChild> GetChild(Guid id);
 
         Guid InsertChild(BaseItemChild baseItemChild);
 

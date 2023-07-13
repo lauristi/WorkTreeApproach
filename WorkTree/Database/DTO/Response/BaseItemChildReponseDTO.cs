@@ -1,6 +1,6 @@
-﻿namespace WorkTree.DTO
+﻿namespace WorkTree.Database.DTO.Response
 {
-    public abstract class BaseItemChildDTO
+    public abstract class BaseItemChildResponseDTO
     {
         public Guid Id { get; set; }
         public Guid ItemId { get; set; }

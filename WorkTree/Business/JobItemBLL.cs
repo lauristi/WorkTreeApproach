@@ -1,10 +1,18 @@
-﻿using WorkTree.Database.Models;
+﻿using WorkTree.Business.Interface;
+using WorkTree.Database.Models;
 using WorkTree.Repositories.Interface;
 
-namespace WorkTree.Repositories
+namespace WorkTree.Business
 {
-    public class JobItemRepository : IJobItemRepository
+    public class JobItemBLL : IJobItemBLL
     {
+        private readonly IJobItemRepository _jobItemRepository;
+
+        public JobItemBLL(IJobItemRepository jobItemRepository)
+        {
+            _jobItemRepository = jobItemRepository;
+        }
+
         public Task<IEnumerable<JobItem>> GetAll()
         {
             throw new NotImplementedException();

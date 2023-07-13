@@ -1,4 +1,4 @@
-﻿namespace WorkTree.Models
+﻿namespace WorkTree.Database.Models
 {
     public abstract class BaseItemChild
     {
