@@ -1,9 +1,10 @@
 ﻿namespace WorkTree.Database.DTO.Response
 {
-    public abstract class JobItemChildResponseDTO
+    public sealed class JobItemChildResponseDTO
     {
         public Guid Id { get; set; }
-        public Guid JobId { get; set; }
+        public Guid ParentId { get; set; }
+        public Guid ChildId { get; set; }
 
         //-------------------------------------
         private DateTime Start { get; set; }
@@ -16,5 +17,10 @@
 
         public Guid OwnerId { get; set; }
         public int Order { get; set; }
+
+        public JobItemChildResponseDTO()
+        {
+                
+        }
     }
 }

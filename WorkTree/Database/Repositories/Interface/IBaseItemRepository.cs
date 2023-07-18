@@ -17,7 +17,7 @@ namespace WorkTree.Repositories.Interface
         //-------------------------------------------------
         Task<BaseItemChild> GetChild(Guid id);
 
-        Task<IEnumerable<BaseItemChild>> GetAllChild();
+        Task<IEnumerable<BaseItemChild>> GetAllChild(Guid id);
 
         Guid InsertChild(BaseItemChild baseItemChild);
 

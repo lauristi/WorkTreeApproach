@@ -1,6 +1,6 @@
 ﻿namespace WorkTree.Database.DTO.Response
 {
-    public abstract class JobItemResponseDTO
+    public sealed class JobItemResponseDTO
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
@@ -17,5 +17,10 @@
 
         public Guid OwnerType { get; set; }
         public Guid OwnerId { get; set; }
+
+        public JobItemResponseDTO()
+        {
+                
+        }
     }
 }

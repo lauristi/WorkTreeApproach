@@ -1,8 +1,9 @@
-﻿namespace WorkTree.Database.Models
+﻿using WorkTree.Database.Models.Base;
+
+namespace WorkTree.Database.Models
 {
-    public class ItemType
+    public class ItemType : BaseEntity
     {
-        public Guid Id { get; set; }
         public string Description { get; set; }
     }
 }

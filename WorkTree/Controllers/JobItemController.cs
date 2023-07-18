@@ -21,7 +21,6 @@ namespace WorkTree.Controllers
         public JobItemController(IJobItemBLL jobItemBLL,
                                  IMapper mapper,
                                  ILogger<JobItemController> logger)
-
         {
             _logger = logger;
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
@@ -80,7 +79,6 @@ namespace WorkTree.Controllers
                                                 JobItemRequestDTO jobItemRequestDTO)
         {
             JobItem jobItem = _mapper.Map<JobItem>(jobItemRequestDTO);
-            jobItem.Id = id;
 
             //if (!jobItem.IsValid){
             //    return new ObjectResult(Results.ValidationProblem(category.Notifications.ConvertToErrorDetails()))
@@ -112,10 +110,10 @@ namespace WorkTree.Controllers
 
         #region JobItemChild
 
-        [HttpGet, Route("child")]
-        public async Task<ActionResult<IEnumerable<JobItemChildResponseDTO>>> JobItemChildGetAllAsync()
+        [HttpGet, Route("{id:guid}/childs")]
+        public async Task<ActionResult<IEnumerable<JobItemChildResponseDTO>>> JobItemChildGetAllAsync([FromRoute] Guid id)
         {
-            var jobItemChilds = await _jobItemBLL.GetAllChild();
+            var jobItemChilds = await _jobItemBLL.GetAllChild(id);
 
             if (jobItemChilds == null)
                 return new ObjectResult(Results.NotFound());
@@ -161,7 +159,6 @@ namespace WorkTree.Controllers
                                                 JobItemChildRequestDTO jobItemChildRequestDTO)
         {
             JobItemChild jobItemChild = _mapper.Map<JobItemChild>(jobItemChildRequestDTO);
-            jobItemChild.Id = id;
 
             //if (!jobItemChild.IsValid){
             //    return new ObjectResult(Results.ValidationProblem(category.Notifications.ConvertToErrorDetails()))

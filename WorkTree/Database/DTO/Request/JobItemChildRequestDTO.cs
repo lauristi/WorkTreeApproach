@@ -1,8 +1,9 @@
-﻿namespace WorkTree.Database.DTO.Request
+﻿ namespace WorkTree.Database.DTO.Request
 {
-    public abstract class JobItemChildRequestDTO
+    public sealed class JobItemChildRequestDTO
     {
-        public Guid JobId { get; set; }
+        public Guid ParentId { get; set; }
+        public Guid ChildId { get; set; }
 
         //-------------------------------------
         private DateTime Start { get; set; }
@@ -15,5 +16,10 @@
 
         public Guid OwnerId { get; set; }
         public int Order { get; set; }
+
+        public JobItemChildRequestDTO()
+        {
+                
+        }
     }
 }

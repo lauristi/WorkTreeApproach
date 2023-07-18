@@ -79,7 +79,6 @@ namespace WorkTree.Controllers
                                                 BaseItemRequestDTO baseItemRequestDTO)
         {
             BaseItem baseItem = _mapper.Map<BaseItem>(baseItemRequestDTO);
-            baseItem.Id = id;
 
             //if (!baseItem.IsValid){
             //    return new ObjectResult(Results.ValidationProblem(category.Notifications.ConvertToErrorDetails()))
@@ -111,10 +110,10 @@ namespace WorkTree.Controllers
 
         #region BaseItemChild
 
-        [HttpGet, Route("child")]
-        public async Task<ActionResult<IEnumerable<BaseItemChildResponseDTO>>> BaseItemChildGetAllAsync()
+        [HttpGet, Route("{id:guid}/childs")]
+        public async Task<ActionResult<IEnumerable<BaseItemChildResponseDTO>>> BaseItemChildGetAllAsync([FromRoute] Guid id)
         {
-            var baseItemChilds = await _baseItemBLL.GetAllChild();
+            var baseItemChilds = await _baseItemBLL.GetAllChild(id);
 
             if (baseItemChilds == null)
                 return new ObjectResult(Results.NotFound());
@@ -160,7 +159,6 @@ namespace WorkTree.Controllers
                                                 BaseItemChildRequestDTO baseItemChildRequestDTO)
         {
             BaseItemChild baseItemChild = _mapper.Map<BaseItemChild>(baseItemChildRequestDTO);
-            baseItemChild.Id = id;
 
             //if (!baseItemChild.IsValid){
             //    return new ObjectResult(Results.ValidationProblem(category.Notifications.ConvertToErrorDetails()))

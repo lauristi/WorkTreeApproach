@@ -1,14 +1,16 @@
-﻿namespace WorkTree.Database.Models
+﻿using WorkTree.Database.Models.Base;
+
+namespace WorkTree.Database.Models
 {
-    public abstract class JobItemChild
+    public class JobItemChild : BaseEntity
     {
-        public Guid Id { get; set; }
-        public Guid JobId { get; set; }
+        public Guid ParentId { get; set; }
+        public Guid ChildId { get; set; }
 
         //-------------------------------------
-        private DateTime Start { get; set; }
+        public DateTime Start { get; set; }
 
-        private DateTime End { get; set; }
+        public DateTime End { get; set; }
         public Guid ItemStatus { get; set; }
 
         //-------------------------------------
@@ -16,5 +18,11 @@
 
         public Guid OwnerId { get; set; }
         public int Order { get; set; }
+
+        public JobItemChild()
+        {
+            this.Start = DateTime.Now;
+            this.End = DateTime.Now.AddMonths(3);
+        }
     }
 }

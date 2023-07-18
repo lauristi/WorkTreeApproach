@@ -16,7 +16,7 @@ namespace WorkTree.Business.Interface
 
         //--------------------------------------
 
-        Task<IEnumerable<JobItemChild>> GetAllChild();
+        Task<IEnumerable<JobItemChild>> GetAllChild(Guid id);
 
         Task<JobItemChild> GetChild(Guid id);
 

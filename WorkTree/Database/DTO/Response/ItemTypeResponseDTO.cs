@@ -1,8 +1,12 @@
 ﻿namespace WorkTree.Database.DTO.Response
 {
-    public class ItemTypeResponseDTO
+    public sealed class ItemTypeResponseDTO
     {
         public Guid Id { get; set; }
         public string Description { get; set; }
+        public ItemTypeResponseDTO()
+        {
+                
+        }
     }
 }

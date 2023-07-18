@@ -15,54 +15,54 @@ namespace WorkTree.Business
 
         public Task<IEnumerable<JobItem>> GetAll()
         {
-            throw new NotImplementedException();
+            return _jobItemRepository.GetAll();
         }
 
         public Task<JobItem> Get(Guid id)
         {
-            throw new NotImplementedException();
+            return _jobItemRepository.Get(id);
         }
 
         public Guid Insert(JobItem jobItem)
         {
-            throw new NotImplementedException();
+            return _jobItemRepository.Insert(jobItem);
         }
 
         public void Update(JobItem jobItem)
         {
-            throw new NotImplementedException();
+            _jobItemRepository.Update(jobItem);
         }
 
         public void Delete(Guid id)
         {
-            throw new NotImplementedException();
+            _jobItemRepository.Delete(id);
         }
 
         #region Child
 
-        public Task<IEnumerable<JobItemChild>> GetAllChild()
+        public Task<IEnumerable<JobItemChild>> GetAllChild(Guid id)
         {
-            throw new NotImplementedException();
+            return _jobItemRepository.GetAllChild(id);
         }
 
         public Task<JobItemChild> GetChild(Guid id)
         {
-            throw new NotImplementedException();
+            return _jobItemRepository.GetChild(id);
         }
 
         public Guid InsertChild(JobItemChild jobItemChild)
         {
-            throw new NotImplementedException();
+            return _jobItemRepository.InsertChild(jobItemChild);
         }
 
         public void UpdateChild(JobItemChild jobItemChild)
         {
-            throw new NotImplementedException();
+            _jobItemRepository.UpdateChild(jobItemChild);
         }
 
         public void DeleteChild(Guid id)
         {
-            throw new NotImplementedException();
+            _jobItemRepository.DeleteChild(id);
         }
 
         #endregion Child

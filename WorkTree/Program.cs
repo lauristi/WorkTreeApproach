@@ -1,5 +1,11 @@
 using AutoMapper;
 using WorkTree.AutoMapper;
+using WorkTree.Business.Interface;
+using WorkTree.Business;
+using WorkTree.Repositories.Interface;
+using WorkTree.Repositories;
+using WorkTree.Database.Dapper.Interface;
+using WorkTree.Database.Dapper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +35,22 @@ IMapper mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
 
 //builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+//--------------------------------------------------------------------------------------------------
+//Injeção de para o connectionString provider
+//--------------------------------------------------------------------------------------------------
+
+builder.Services.AddScoped<IConnectionStringProvider, ConnectionStringProvider>();
+
+//--------------------------------------------------------------------------------------------------
+//Injeção de dependencias
+//--------------------------------------------------------------------------------------------------
+
+builder.Services.AddScoped<IBaseItemRepository, BaseItemRepository>();
+builder.Services.AddScoped<IJobItemRepository, JobItemRepository>();
+
+builder.Services.AddScoped<IBaseItemBLL, BaseItemBLL>();
+builder.Services.AddScoped<IJobItemBLL, JobItemBLL>();
 
 var app = builder.Build();
 

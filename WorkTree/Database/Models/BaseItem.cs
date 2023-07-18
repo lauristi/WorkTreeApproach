@@ -1,8 +1,9 @@
-﻿namespace WorkTree.Database.Models
+﻿using WorkTree.Database.Models.Base;
+
+namespace WorkTree.Database.Models
 {
-    public abstract class BaseItem
+    public class BaseItem : BaseEntity
     {
-        public Guid Id { get; set; }
         public string Name { get; set; }
         public string Image { get; set; }
 
@@ -11,5 +12,10 @@
 
         public Guid OwnerType { get; set; }
         public Guid OwnerId { get; set; }
+
+        public override bool IsValid()
+        {
+            return !string.IsNullOrWhiteSpace(this.Name);
+        }
     }
 }

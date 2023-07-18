@@ -1,7 +1,12 @@
 ﻿namespace WorkTree.Database.DTO.Request
 {
-    public class OwnerTypeRequestDTO
+    public sealed class OwnerTypeRequestDTO
     {
         public string Description { get; set; }
+
+        public OwnerTypeRequestDTO()
+        {
+                
+        }
     }
 }

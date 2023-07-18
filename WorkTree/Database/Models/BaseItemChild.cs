@@ -1,9 +1,11 @@
-﻿namespace WorkTree.Database.Models
+﻿using WorkTree.Database.Models.Base;
+
+namespace WorkTree.Database.Models
 {
-    public abstract class BaseItemChild
+    public class BaseItemChild : BaseEntity
     {
-        public Guid Id { get; set; }
-        public Guid ItemId { get; set; }
+        public Guid ParentId { get; set; }
+        public Guid ChildId { get; set; }
 
         //----------------------------------------
         public Guid OwnerType { get; set; }
