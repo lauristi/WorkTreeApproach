@@ -8,9 +8,9 @@ namespace WorkTree.Database.Models
         public string Image { get; set; }
 
         //----------------------------------------
-        public Guid ItemType { get; set; }
+        public Guid ItemTypeId { get; set; }
 
-        public Guid OwnerType { get; set; }
+        public Guid OwnerTypeId { get; set; }
         public Guid OwnerId { get; set; }
 
         public override bool IsValid()

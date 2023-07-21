@@ -108,45 +108,45 @@ namespace WorkTree.Controllers
 
         #endregion BaseItem
 
-        #region BaseItemChild
+        #region BaseItemRelation
 
-        [HttpGet, Route("{id:guid}/childs")]
-        public async Task<ActionResult<IEnumerable<BaseItemChildResponseDTO>>> BaseItemChildGetAllAsync([FromRoute] Guid id)
+        [HttpGet, Route("{id:guid}/itemRelations")]
+        public async Task<ActionResult<IEnumerable<BaseItemRelationResponseDTO>>> BaseItemRelationGetAllAsync([FromRoute] Guid id)
         {
-            var baseItemChilds = await _baseItemBLL.GetAllChild(id);
+            var baseItemRelations = await _baseItemBLL.GetAllItemRelation(id);
 
-            if (baseItemChilds == null)
+            if (baseItemRelations == null)
                 return new ObjectResult(Results.NotFound());
 
-            var baseItemChildsResponseDTO = _mapper.Map<IEnumerable<BaseItemChildResponseDTO>>(baseItemChilds);
-            return new ObjectResult(baseItemChildsResponseDTO);
+            var baseItemRelationsResponseDTO = _mapper.Map<IEnumerable<BaseItemRelationResponseDTO>>(baseItemRelations);
+            return new ObjectResult(baseItemRelationsResponseDTO);
         }
 
-        [HttpGet, Route("child/{id:guid}")]
-        public async Task<ActionResult<BaseItemChildResponseDTO>> BaseItemChildGetAsync([FromRoute] Guid id)
+        [HttpGet, Route("itemRelation/{id:guid}")]
+        public async Task<ActionResult<BaseItemRelationResponseDTO>> BaseItemRelationGetAsync([FromRoute] Guid id)
         {
-            var baseItemChild = await _baseItemBLL.GetChild(id);
+            var baseItemRelation = await _baseItemBLL.GetItemRelation(id);
 
-            if (baseItemChild == null)
+            if (baseItemRelation == null)
                 return new ObjectResult(Results.NotFound());
 
-            var baseItemChildResponseDTO = _mapper.Map<BaseItemChildResponseDTO>(baseItemChild);
-            return new ObjectResult(baseItemChildResponseDTO);
+            var baseItemRelationResponseDTO = _mapper.Map<BaseItemRelationResponseDTO>(baseItemRelation);
+            return new ObjectResult(baseItemRelationResponseDTO);
         }
 
-        [HttpPost, Route("child")]
-        public IActionResult BaseItemChildPost(BaseItemChildRequestDTO baseItemChildRequestDTO)
+        [HttpPost, Route("itemRelation")]
+        public IActionResult BaseItemRelationPost(BaseItemRelationRequestDTO baseItemRelationRequestDTO)
         {
-            BaseItemChild baseItemChild = _mapper.Map<BaseItemChild>(baseItemChildRequestDTO);
+            BaseItemRelation baseItemRelation = _mapper.Map<BaseItemRelation>(baseItemRelationRequestDTO);
 
-            //if (!baseItemChild.IsValid){
+            //if (!baseItemRelation.IsValid){
             //    return new ObjectResult(Results.ValidationProblem(category.Notifications.ConvertToErrorDetails()))
             //    {
             //        StatusCode = StatusCodes.Status400BadRequest
             //    };
             //}
 
-            var newId = _baseItemBLL.InsertChild(baseItemChild);
+            var newId = _baseItemBLL.InsertItemRelation(baseItemRelation);
 
             return new ObjectResult(Results.Created($"/baseitem/{newId}", newId))
             {
@@ -154,20 +154,20 @@ namespace WorkTree.Controllers
             };
         }
 
-        [HttpPut, Route("child/{id:guid}")]
-        public IActionResult BaseItemChildPut([FromRoute] Guid id,
-                                                BaseItemChildRequestDTO baseItemChildRequestDTO)
+        [HttpPut, Route("itemRelation/{id:guid}")]
+        public IActionResult BaseItemRelationPut([FromRoute] Guid id,
+                                                BaseItemRelationRequestDTO baseItemRelationRequestDTO)
         {
-            BaseItemChild baseItemChild = _mapper.Map<BaseItemChild>(baseItemChildRequestDTO);
+            BaseItemRelation baseItemRelation = _mapper.Map<BaseItemRelation>(baseItemRelationRequestDTO);
 
-            //if (!baseItemChild.IsValid){
+            //if (!baseItemRelation.IsValid){
             //    return new ObjectResult(Results.ValidationProblem(category.Notifications.ConvertToErrorDetails()))
             //    {
             //        StatusCode = StatusCodes.Status400BadRequest
             //    };
             //}
 
-            _baseItemBLL.UpdateChild(baseItemChild);
+            _baseItemBLL.UpdateItemRelation(baseItemRelation);
 
             return new ObjectResult(Results.Ok())
             {
@@ -175,10 +175,10 @@ namespace WorkTree.Controllers
             };
         }
 
-        [HttpDelete, Route("child/{id:guid}")]
-        public IActionResult BaseItemChildDelete([FromRoute] Guid id)
+        [HttpDelete, Route("itemRelation/{id:guid}")]
+        public IActionResult BaseItemRelationDelete([FromRoute] Guid id)
         {
-            _baseItemBLL.DeleteChild(id);
+            _baseItemBLL.DeleteItemRelation(id);
 
             return new ObjectResult(Results.Ok())
             {
@@ -186,6 +186,6 @@ namespace WorkTree.Controllers
             };
         }
 
-        #endregion BaseItemChild
+        #endregion BaseItemRelation
     }
 }

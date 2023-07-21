@@ -47,10 +47,8 @@ builder.Services.AddScoped<IConnectionStringProvider, ConnectionStringProvider>(
 //--------------------------------------------------------------------------------------------------
 
 builder.Services.AddScoped<IBaseItemRepository, BaseItemRepository>();
-builder.Services.AddScoped<IJobItemRepository, JobItemRepository>();
-
 builder.Services.AddScoped<IBaseItemBLL, BaseItemBLL>();
-builder.Services.AddScoped<IJobItemBLL, JobItemBLL>();
+
 
 var app = builder.Build();
 

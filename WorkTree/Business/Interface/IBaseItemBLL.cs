@@ -16,14 +16,14 @@ namespace WorkTree.Business.Interface
 
         //-------------------------------------------------
 
-        Task<IEnumerable<BaseItemChild>> GetAllChild(Guid id);
+        Task<IEnumerable<BaseItemRelation>> GetAllItemRelation(Guid id);
 
-        Task<BaseItemChild> GetChild(Guid id);
+        Task<BaseItemRelation> GetItemRelation(Guid id);
 
-        Guid InsertChild(BaseItemChild baseItemChild);
+        Guid InsertItemRelation(BaseItemRelation baseItemRelation);
 
-        void UpdateChild(BaseItemChild baseItemChild);
+        void UpdateItemRelation(BaseItemRelation baseItemRelation);
 
-        void DeleteChild(Guid id);
+        void DeleteItemRelation(Guid id);
     }
 }

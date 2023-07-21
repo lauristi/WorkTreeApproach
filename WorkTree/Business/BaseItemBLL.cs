@@ -38,33 +38,33 @@ namespace WorkTree.Business
             _baseItemRepository.Delete(id);
         }
 
-        #region Child
+        #region ItemRelation
 
-        public Task<IEnumerable<BaseItemChild>> GetAllChild(Guid id)
+        public Task<IEnumerable<BaseItemRelation>> GetAllItemRelation(Guid id)
         {
-            return _baseItemRepository.GetAllChild(id);
+            return _baseItemRepository.GetAllItemRelation(id);
         }
 
-        public Task<BaseItemChild> GetChild(Guid id)
+        public Task<BaseItemRelation> GetItemRelation(Guid id)
         {
-            return _baseItemRepository.GetChild(id);
+            return _baseItemRepository.GetItemRelation(id);
         }
 
-        public Guid InsertChild(BaseItemChild baseItemChild)
+        public Guid InsertItemRelation(BaseItemRelation baseItemRelation)
         {
-            return _baseItemRepository.InsertChild(baseItemChild);
+            return _baseItemRepository.InsertItemRelation(baseItemRelation);
         }
 
-        public void UpdateChild(BaseItemChild baseItemChild)
+        public void UpdateItemRelation(BaseItemRelation baseItemRelation)
         {
-            _baseItemRepository.UpdateChild(baseItemChild);
+            _baseItemRepository.UpdateItemRelation(baseItemRelation);
         }
 
-        public void DeleteChild(Guid id)
+        public void DeleteItemRelation(Guid id)
         {
-            _baseItemRepository.DeleteChild(id);
+            _baseItemRepository.DeleteItemRelation(id);
         }
 
-        #endregion Child
+        #endregion ItemRelation
     }
 }

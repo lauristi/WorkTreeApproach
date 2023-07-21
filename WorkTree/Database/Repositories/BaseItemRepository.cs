@@ -18,6 +18,8 @@ namespace WorkTree.Repositories
             connectionString = _connectionStringProvider.GetConnectionString();
         }
 
+        #region Item
+
         public async Task<IEnumerable<BaseItem>> GetAll()
         {
             using IDbConnection connection = new SqlConnection(connectionString);
@@ -46,18 +48,18 @@ namespace WorkTree.Repositories
                 Id = baseItem.Id,
                 Name = baseItem.Name,
                 Image = baseItem.Image,
-                ItemType = baseItem.ItemType,
-                OwnerType = baseItem.OwnerType,
+                ItemType = baseItem.ItemTypeId,
+                OwnerType = baseItem.OwnerTypeId,
                 OwnerId = baseItem.OwnerId
             };
 
             String sql = @"INSERT INTO BASEITEM (Id,
                                              Name,
                                              Image,
-                                             ItemType,
-                                             OwnerType,
+                                             ItemTypeId,
+                                             OwnerTypeId,
                                              OwnerId)
-                              VALUES(@Id, @Name, @Image, @ItemType, @OwnerType, @OwnerId)";
+                              VALUES(@Id, @Name, @Image, @ItemTypeId, @OwnerTypeId, @OwnerId)";
             //-----------------------------------------------------------------
             connection.Execute(sql, parameters);
 
@@ -73,15 +75,15 @@ namespace WorkTree.Repositories
                 Id = baseItem.Id,
                 Name = baseItem.Name,
                 Image = baseItem.Image,
-                ItemType = baseItem.ItemType,
-                OwnerType = baseItem.OwnerType,
+                ItemType = baseItem.ItemTypeId,
+                OwnerType = baseItem.OwnerTypeId,
                 OwnerId = baseItem.OwnerId
             };
 
             string sql = @"UPDATE BASEITEM SET Name = @Name,
                                            Image = @Image,
-                                           ItemType = @ItemType,
-                                           OwnerType = @OwnerType,
+                                           ItemTypeId = @ItemTypeId,
+                                           OwnerTypeId = @OwnerTypeId,
                                            OwnerId = @OwnerId
                                      WHERE Id = @Id";
             //------------------------------------------------------
@@ -96,92 +98,126 @@ namespace WorkTree.Repositories
             connection.Execute(sql, new { Id = id });
         }
 
-        #region Child
+        #endregion Item
 
-        public async Task<IEnumerable<BaseItemChild>> GetAllChild(Guid id)
+        #region ItemRelation
+
+        public async Task<IEnumerable<BaseItemRelation>> GetAllItemRelation(Guid id)
         {
             using IDbConnection connection = new SqlConnection(connectionString);
 
             string sql = @"SELECT *
-                             FROM BASEITEMCHILD
+                             FROM BASEITEMRELATION
                             WHERE ParentId ={@id}";
             //------------------------------------------------------
-            return await connection.QueryAsync<BaseItemChild>(sql);
+            return await connection.QueryAsync<BaseItemRelation>(sql);
         }
 
-        public async Task<BaseItemChild> GetChild(Guid id)
+        public async Task<BaseItemRelation> GetItemRelation(Guid id)
         {
             using IDbConnection connection = new SqlConnection(connectionString);
 
             string sql = @"SELECT *
-                             FROM BASEITEMCHILD
+                             FROM BASEITEMRELATION
                             WHERE Id = @Id";
             //------------------------------------------------------
-            return await connection.QuerySingleOrDefaultAsync<BaseItemChild>(sql, new { Id = id });
+            return await connection.QuerySingleOrDefaultAsync<BaseItemRelation>(sql, new { Id = id });
         }
 
-        public Guid InsertChild(BaseItemChild baseItemChild)
+        public Guid InsertItemRelation(BaseItemRelation baseItemRelation)
         {
             using IDbConnection connection = new SqlConnection(connectionString);
 
             var parameters = new
             {
-                Id = baseItemChild.Id,
-                ParentId = baseItemChild.ParentId,
-                ChildId = baseItemChild.ChildId,
-                OwnerType = baseItemChild.OwnerType,
-                OwnerId = baseItemChild.OwnerId,
-                Order = baseItemChild.Order
+                Id = baseItemRelation.Id,
+                ParentId = baseItemRelation.ParentId,
+                Name = baseItemRelation.Name,
+                Image = baseItemRelation.Image,
+                ItemTypeId = baseItemRelation.ItemTypeId,
+                StartDate = baseItemRelation.StartDate,
+                EndDate = baseItemRelation.EndDate,
+                ItemStatusId = baseItemRelation.ItemStatusId,
+                OwnerTypeId = baseItemRelation.OwnerTypeId,
+                OwnerId = baseItemRelation.OwnerId,
+                ItemOrder = baseItemRelation.ItemOrder
             };
 
-            string sql = @"INSERT INTO BASEITEMCHILD (Id,
-                                                      parentId,
-                                                      childId
-                                                      ItemId,
-                                                      OwnerType,
-                                                      OwnerId,
-                                                      [Order])
-                                          VALUES (@Id,@ParentId,@ChildId, @ItemId, @OwnerType, @OwnerId, @Order)";
+            string sql = @"INSERT INTO BASEITEMRELATION(
+                                       ID,
+                                       PARENTID,
+                                       NAME,
+                                       IMAGE,
+                                       ITEMTYPEID,
+                                       STARTDATE,
+                                       ENDDATE,
+                                       ITEMSTATUSID,
+                                       OWNERTYPEID,
+                                       OWNERID,
+                                       ITEMORDER)
+                                 VALUES(@Id,
+                                        @ParentId,
+                                        @Name,
+                                        @Image,
+                                        @ItemTypeId,
+                                        @StartDate,
+                                        @EndDate,
+                                        @ItemStatusId,
+                                        @OwnerTypeId,
+                                        @OwnerId,
+                                        @ItemOrder)";
             //------------------------------------------------------
             connection.Execute(sql, parameters);
 
-            return baseItemChild.Id;
+            return baseItemRelation.Id;
         }
 
-        public void UpdateChild(BaseItemChild baseItemChild)
+        public void UpdateItemRelation(BaseItemRelation baseItemRelation)
         {
             using IDbConnection connection = new SqlConnection(connectionString);
 
             var parameters = new
             {
-                Id = baseItemChild.Id,
-                ParentId = baseItemChild.ParentId,
-                ChildId = baseItemChild.ChildId,
-                OwnerType = baseItemChild.OwnerType,
-                OwnerId = baseItemChild.OwnerId,
-                Order = baseItemChild.Order
+                Id = baseItemRelation.Id,
+                ParentId = baseItemRelation.ParentId,
+                Name = baseItemRelation.Name,
+                Image = baseItemRelation.Image,
+                ItemTypeId = baseItemRelation.ItemTypeId,
+                StartDate = baseItemRelation.StartDate,
+                EndDate = baseItemRelation.EndDate,
+                ItemStatusId = baseItemRelation.ItemStatusId,
+                OwnerTypeId = baseItemRelation.OwnerTypeId,
+                OwnerId = baseItemRelation.OwnerId,
+                ItemOrder = baseItemRelation.ItemOrder
             };
 
-            string sql = @"UPDATE BASEITEMCHILD SET ParentId = @ParentId,
-                                                     ChildId = @ChildId,
-                                                     OwnerType = @OwnerType,
-                                                     OwnerId = @OwnerId,
-                                                     [Order] = @Order
-                                              WHERE Id = @Id";
+            string sql = @"UPDATET BASEITEMRELATION SET
+                                       ID=@Id,
+                                       PARENTID=@ParentId,
+                                       NAME=@Name,
+                                       IMAGE=@Image,
+                                       ITEMTYPEID=@ItemTypeId,
+                                       STARTDATE=@StartDate,
+                                       ENDDATE=@EndDate,
+                                       ITEMSTATUSID=@ItemStatusId,
+                                       OWNERTYPEID=@OwnerTypeId,
+                                       OWNERID=@OwnerId,
+                                       ITEMORDER=@ItemOrder)
+                                 WHERE ID = @Id";
             //------------------------------------------------------
             connection.Execute(sql, parameters);
         }
 
-        public void DeleteChild(Guid id)
+        public void DeleteItemRelation(Guid id)
         {
             using IDbConnection connection = new SqlConnection(connectionString);
 
-            string sql = @"DELETE FROM BASEITEMCHILD
-                             WHERE Id = @Id";
+            string sql = @"DELETE FROM BASEITEMRELATION
+                                 WHERE ID = @Id";
             //------------------------------------------------------
             connection.Execute(sql, new { Id = id });
         }
 
-        #endregion Child
+        #endregion ItemRelation
     }
 }
