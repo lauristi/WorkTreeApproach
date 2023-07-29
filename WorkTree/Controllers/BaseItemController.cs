@@ -187,5 +187,21 @@ namespace WorkTree.Controllers
         }
 
         #endregion BaseItemRelation
+
+        #region BaseRelationTree
+
+        [HttpGet, Route("/workTree/{id:guid}")]
+        public ActionResult<TreeBaseItemRelationResponseDTO> BaseItemRelationTreeBuild([FromRoute] Guid id)
+        {
+            var treeBaseItemRelations = _baseItemBLL.BuildTree(id,true,true);
+
+            if (treeBaseItemRelations == null)
+                return new ObjectResult(Results.NotFound());
+
+            var treeBaseItemRelationsResponseDTO = _mapper.Map<TreeBaseItemRelationResponseDTO>(treeBaseItemRelations);
+            return new ObjectResult(treeBaseItemRelationsResponseDTO);
+        }
+
+        #endregion BaseRelationTree
     }
 }

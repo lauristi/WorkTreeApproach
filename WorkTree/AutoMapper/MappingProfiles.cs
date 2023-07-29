@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using WorkTree.Business.TreeBase;
 using WorkTree.Database.DTO.Request;
 using WorkTree.Database.DTO.Response;
 using WorkTree.Database.Models;
+using WorkTree.Database.Models.Tree;
 
 namespace WorkTree.AutoMapper
 {
@@ -19,7 +19,7 @@ namespace WorkTree.AutoMapper
             CreateMap<BaseItemRelation, BaseItemRelationRequestDTO>().ReverseMap();
 
             //Base Item Tree
-            CreateMap<BaseItemRelation, TreeBaseItemRelation>().ReverseMap();
+            CreateMap<TreeBaseItemRelation, TreeBaseItemRelationResponseDTO>().ReverseMap();
 
             //Types
             CreateMap<ItemStatus, ItemStatusResponseDTO>().ReverseMap();

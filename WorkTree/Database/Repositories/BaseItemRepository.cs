@@ -1,9 +1,9 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
 using System.Data;
-using WorkTree.Business.TreeBase;
 using WorkTree.Database.Dapper.Interface;
 using WorkTree.Database.Models;
+using WorkTree.Database.Models.Tree;
 using WorkTree.Repositories.Interface;
 
 namespace WorkTree.Repositories

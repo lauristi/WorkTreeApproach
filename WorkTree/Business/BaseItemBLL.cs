@@ -1,6 +1,6 @@
 ﻿using WorkTree.Business.Interface;
-using WorkTree.Business.TreeBase;
 using WorkTree.Database.Models;
+using WorkTree.Database.Models.Tree;
 using WorkTree.Repositories.Interface;
 
 namespace WorkTree.Business
@@ -98,26 +98,35 @@ namespace WorkTree.Business
                 Id = currentItem.Id,
                 ParentId = currentItem.ParentId,
                 Name = currentItem.Name,
-                // Clone other properties as needed...
+                Image = currentItem.Image,
+                ItemTypeId = currentItem.ItemTypeId,
+                StartDate = currentItem.StartDate,
+                EndDate = currentItem.EndDate,
+                ItemStatusId = currentItem.ItemStatusId,
+                OwnerTypeId = currentItem.OwnerTypeId,
+                OwnerId = currentItem.OwnerId,
+                ItemOrder = currentItem.ItemOrder,
+                Parent = currentItem.Parent,
+                Children = currentItem.Children
             };
 
-            if (includeParentsAndChildren)
-            {
+            //if (includeParentsAndChildren){
+                
                 if (currentItem.ParentId.HasValue)
                 {
                     TreeBaseItemRelation parentItem = _baseItemRepository.GetItemRelationTree(currentItem.ParentId.Value);
                     clonedItem.Parent = BuildTreeRecursive(parentItem, true, excludeChildrenFromParents);
                 }
 
-                if (!excludeChildrenFromParents)
-                {
+                //if (excludeChildrenFromParents){
+                    
                     var children = _baseItemRepository.GetItemRelationTreeChildren(currentItem.Id);
                     foreach (var child in children)
                     {
                         clonedItem.Children.Add(BuildTreeRecursive(child, true, false));
                     }
-                }
-            }
+                //}
+            //}
 
             return clonedItem;
         }

@@ -1,5 +1,5 @@
-﻿using WorkTree.Business.TreeBase;
-using WorkTree.Database.Models;
+﻿using WorkTree.Database.Models;
+using WorkTree.Database.Models.Tree;
 
 namespace WorkTree.Business.Interface
 {

@@ -1,4 +1,4 @@
-﻿namespace WorkTree.Business.TreeBase
+﻿namespace WorkTree.Database.Models.Tree
 {
     public class TreeBaseItemRelation
     {
