@@ -3,9 +3,9 @@
     public sealed class ItemStatusRequestDTO
     {
         public string Description { get; set; }
+
         public ItemStatusRequestDTO()
         {
-            
         }
     }
 }

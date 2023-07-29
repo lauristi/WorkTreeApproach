@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
 using System.Data;
+using WorkTree.Business.TreeBase;
 using WorkTree.Database.Dapper.Interface;
 using WorkTree.Database.Models;
 using WorkTree.Repositories.Interface;
@@ -219,5 +220,96 @@ namespace WorkTree.Repositories
         }
 
         #endregion ItemRelation
+
+        #region ItemRelationTree
+
+        public TreeBaseItemRelation GetItemRelationTree(Guid id)
+        {
+            using IDbConnection connection = new SqlConnection(connectionString);
+
+            string sql = @"SELECT Id,
+                                  ParentId,
+                                  Name,
+                                  Image,
+                                  ItemTypeId,
+                                  StartDate,
+                                  EndDate,
+                                  ItemStatusId,
+                                  OwnerTypeId,
+                                  OwnerId,
+                                  ItemOrder
+                             FROM BASEITEMRELATION
+                            WHERE Id = @Id";
+            //--------------------------------------------------------------------------------
+            var result = connection.QuerySingleOrDefault(sql, new { Id = id });
+
+            TreeBaseItemRelation baseItemTree = new TreeBaseItemRelation();
+
+            if (result == null)
+            {
+                return baseItemTree;
+            }
+
+            baseItemTree.Id = result.Id;
+            baseItemTree.ParentId = result.ParentId;
+            baseItemTree.Name = result.Name;
+            baseItemTree.Image = result.Image;
+            baseItemTree.ItemTypeId = result.ItemTypeId;
+            baseItemTree.StartDate = result.StartDate;
+            baseItemTree.EndDate = result.EndDate;
+            baseItemTree.ItemStatusId = result.ItemStatusId;
+            baseItemTree.OwnerTypeId = result.OwnerTypeId;
+            baseItemTree.OwnerId = result.OwnerId;
+            baseItemTree.ItemOrder = result.ItemOrder;
+
+            return baseItemTree;
+        }
+
+        public IEnumerable<TreeBaseItemRelation> GetItemRelationTreeChildren(Guid parentId)
+        {
+            using IDbConnection connection = new SqlConnection(connectionString);
+
+            string sql = @"SELECT Id,
+                                  ParentId,
+                                  Name,
+                                  Image,
+                                  ItemTypeId,
+                                  StartDate,
+                                  EndDate,
+                                  ItemStatusId,
+                                  OwnerTypeId,
+                                  OwnerId,
+                                  ItemOrder
+                             FROM BASEITEMRELATION
+                         WHERE ParentId = @parentId";
+
+            var results = connection.Query(sql, new { ParentId = parentId });
+
+            List<TreeBaseItemRelation> children = new List<TreeBaseItemRelation>();
+
+            foreach (var result in results)
+            {
+                TreeBaseItemRelation itemTree = new TreeBaseItemRelation
+                {
+                    Id = result.Id,
+                    ParentId = result.ParentId,
+                    Name = result.Name,
+                    Image = result.Image,
+                    ItemTypeId = result.ItemTypeId,
+                    StartDate = result.StartDate,
+                    EndDate = result.EndDate,
+                    ItemStatusId = result.ItemStatusId,
+                    OwnerTypeId = result.OwnerTypeId,
+                    OwnerId = result.OwnerId,
+                    ItemOrder = result.ItemOrder
+                };
+
+                children.Add(itemTree);
+            }
+
+            return children;
+        }
+
+        #endregion ItemRelationTree
     }
 }

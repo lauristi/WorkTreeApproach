@@ -1,11 +1,11 @@
 using AutoMapper;
 using WorkTree.AutoMapper;
-using WorkTree.Business.Interface;
 using WorkTree.Business;
-using WorkTree.Repositories.Interface;
-using WorkTree.Repositories;
-using WorkTree.Database.Dapper.Interface;
+using WorkTree.Business.Interface;
 using WorkTree.Database.Dapper;
+using WorkTree.Database.Dapper.Interface;
+using WorkTree.Repositories;
+using WorkTree.Repositories.Interface;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,7 +48,6 @@ builder.Services.AddScoped<IConnectionStringProvider, ConnectionStringProvider>(
 
 builder.Services.AddScoped<IBaseItemRepository, BaseItemRepository>();
 builder.Services.AddScoped<IBaseItemBLL, BaseItemBLL>();
-
 
 var app = builder.Build();
 

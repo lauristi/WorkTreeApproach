@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-
-namespace WorkTree.Database.Dapper
+﻿namespace WorkTree.Database.Dapper
 {
     public class ConnectionStringProvider : AbstractConnectionStringProvider
     {

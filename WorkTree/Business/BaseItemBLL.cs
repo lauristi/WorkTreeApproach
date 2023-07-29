@@ -1,4 +1,5 @@
 ﻿using WorkTree.Business.Interface;
+using WorkTree.Business.TreeBase;
 using WorkTree.Database.Models;
 using WorkTree.Repositories.Interface;
 
@@ -6,6 +7,8 @@ namespace WorkTree.Business
 {
     public class BaseItemBLL : IBaseItemBLL
     {
+        #region Item
+
         private readonly IBaseItemRepository _baseItemRepository;
 
         public BaseItemBLL(IBaseItemRepository baseItemRepository)
@@ -38,6 +41,8 @@ namespace WorkTree.Business
             _baseItemRepository.Delete(id);
         }
 
+        #endregion Item
+
         #region ItemRelation
 
         public Task<IEnumerable<BaseItemRelation>> GetAllItemRelation(Guid id)
@@ -65,6 +70,58 @@ namespace WorkTree.Business
             _baseItemRepository.DeleteItemRelation(id);
         }
 
+        public IBaseItemRepository Get_baseItemRepository()
+        {
+            return _baseItemRepository;
+        }
+
         #endregion ItemRelation
+
+        #region Build Tree
+
+        public TreeBaseItemRelation BuildTree(Guid referenceItemId,
+                                              bool includeParentsAndChildren = false,
+                                              bool excludeChildrenFromParents = false)
+        {
+            TreeBaseItemRelation rootItem = _baseItemRepository.GetItemRelationTree(referenceItemId);
+
+            return BuildTreeRecursive(rootItem, includeParentsAndChildren, excludeChildrenFromParents);
+        }
+
+        private TreeBaseItemRelation BuildTreeRecursive(TreeBaseItemRelation currentItem, bool includeParentsAndChildren, bool excludeChildrenFromParents)
+        {
+            if (currentItem == null)
+                return null;
+
+            TreeBaseItemRelation clonedItem = new TreeBaseItemRelation
+            {
+                Id = currentItem.Id,
+                ParentId = currentItem.ParentId,
+                Name = currentItem.Name,
+                // Clone other properties as needed...
+            };
+
+            if (includeParentsAndChildren)
+            {
+                if (currentItem.ParentId.HasValue)
+                {
+                    TreeBaseItemRelation parentItem = _baseItemRepository.GetItemRelationTree(currentItem.ParentId.Value);
+                    clonedItem.Parent = BuildTreeRecursive(parentItem, true, excludeChildrenFromParents);
+                }
+
+                if (!excludeChildrenFromParents)
+                {
+                    var children = _baseItemRepository.GetItemRelationTreeChildren(currentItem.Id);
+                    foreach (var child in children)
+                    {
+                        clonedItem.Children.Add(BuildTreeRecursive(child, true, false));
+                    }
+                }
+            }
+
+            return clonedItem;
+        }
+
+        #endregion Build Tree
     }
 }

@@ -1,6 +1,6 @@
-﻿namespace WorkTree.Database.DTO.Response
+﻿namespace WorkTree.Business.TreeBase
 {
-    public sealed class BaseItemRelationResponseDTO
+    public class TreeBaseItemRelation
     {
         public Guid Id { get; set; }
         public Guid? ParentId { get; set; }
@@ -12,7 +12,6 @@
         public DateTime StartDate { get; set; }
 
         public DateTime EndDate { get; set; }
-
         public Guid ItemStatusId { get; set; }
 
         //----------------------------------------
@@ -23,8 +22,9 @@
         //----------------------------------------
         public int ItemOrder { get; set; }
 
-        public BaseItemRelationResponseDTO()
-        {
-        }
+        // Pai e Filhos para montagem hieraquica
+        public TreeBaseItemRelation Parent { get; set; }
+
+        public List<TreeBaseItemRelation> Children { get; set; } = new List<TreeBaseItemRelation>();
     }
 }

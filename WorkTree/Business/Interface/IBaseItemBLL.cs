@@ -1,9 +1,12 @@
-﻿using WorkTree.Database.Models;
+﻿using WorkTree.Business.TreeBase;
+using WorkTree.Database.Models;
 
 namespace WorkTree.Business.Interface
 {
     public interface IBaseItemBLL
     {
+        #region CRUD
+
         Task<IEnumerable<BaseItem>> GetAll();
 
         Task<BaseItem> Get(Guid id);
@@ -14,7 +17,9 @@ namespace WorkTree.Business.Interface
 
         void Delete(Guid id);
 
-        //-------------------------------------------------
+        #endregion CRUD
+
+        #region CRUD Relation
 
         Task<IEnumerable<BaseItemRelation>> GetAllItemRelation(Guid id);
 
@@ -25,5 +30,15 @@ namespace WorkTree.Business.Interface
         void UpdateItemRelation(BaseItemRelation baseItemRelation);
 
         void DeleteItemRelation(Guid id);
+
+        #endregion CRUD Relation
+
+        #region TreeBuilder
+
+        TreeBaseItemRelation BuildTree(Guid itemId,
+                               bool includeParentsAndChildren = false,
+                               bool excludeChildrenFromParents = false);
+
+        #endregion TreeBuilder
     }
 }

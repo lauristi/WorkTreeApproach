@@ -1,9 +1,12 @@
-﻿using WorkTree.Database.Models;
+﻿using WorkTree.Business.TreeBase;
+using WorkTree.Database.Models;
 
 namespace WorkTree.Repositories.Interface
 {
     public interface IBaseItemRepository
     {
+        #region Item
+
         Task<BaseItem> Get(Guid id);
 
         Task<IEnumerable<BaseItem>> GetAll();
@@ -14,7 +17,10 @@ namespace WorkTree.Repositories.Interface
 
         void Delete(Guid id);
 
-        //-------------------------------------------------
+        #endregion Item
+
+        #region ItemRelation
+
         Task<BaseItemRelation> GetItemRelation(Guid id);
 
         Task<IEnumerable<BaseItemRelation>> GetAllItemRelation(Guid id);
@@ -24,5 +30,15 @@ namespace WorkTree.Repositories.Interface
         void UpdateItemRelation(BaseItemRelation baseItemRelation);
 
         void DeleteItemRelation(Guid id);
+
+        #endregion ItemRelation
+
+        #region ItemRelationTree
+
+        TreeBaseItemRelation GetItemRelationTree(Guid id);
+
+        IEnumerable<TreeBaseItemRelation> GetItemRelationTreeChildren(Guid parentId);
+
+        #endregion ItemRelationTree
     }
 }
