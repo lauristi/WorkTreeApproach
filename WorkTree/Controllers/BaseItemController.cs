@@ -4,6 +4,7 @@ using WorkTree.Business.Interface;
 using WorkTree.Database.DTO.Request;
 using WorkTree.Database.DTO.Response;
 using WorkTree.Database.Models;
+using WorkTree.Database.Models.Tree;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -190,10 +191,12 @@ namespace WorkTree.Controllers
 
         #region BaseRelationTree
 
-        [HttpGet, Route("/workTree/{id:guid}")]
-        public ActionResult<TreeBaseItemRelationResponseDTO> BaseItemRelationTreeBuild([FromRoute] Guid id)
+        [HttpPost, Route("/workTree")]
+        public ActionResult<TreeBaseItemRelationResponseDTO> BaseItemRelationTreeBuild(TreeBuilderOptionsRequestDTO treeBuilderOptionsRequestDTO)
         {
-            var treeBaseItemRelations = _baseItemBLL.BuildTree(id,true,true);
+            var treeBuilderOptions = _mapper.Map<TreeBuilderOptions>(treeBuilderOptionsRequestDTO);
+
+            var treeBaseItemRelations = _baseItemBLL.TreeBuilder(treeBuilderOptions);
 
             if (treeBaseItemRelations == null)
                 return new ObjectResult(Results.NotFound());

@@ -35,9 +35,7 @@ namespace WorkTree.Business.Interface
 
         #region TreeBuilder
 
-        TreeBaseItemRelation BuildTree(Guid itemId,
-                               bool includeParentsAndChildren = false,
-                               bool excludeChildrenFromParents = false);
+        TreeBaseItemRelation TreeBuilder(TreeBuilderOptions treeBuilderOptions);
 
         #endregion TreeBuilder
     }

@@ -39,6 +39,8 @@ namespace WorkTree.Repositories.Interface
 
         IEnumerable<TreeBaseItemRelation> GetItemRelationTreeChildren(Guid parentId);
 
+        Guid GetParentOf(Guid id);
+
         #endregion ItemRelationTree
     }
 }

@@ -79,16 +79,60 @@ namespace WorkTree.Business
 
         #region Build Tree
 
-        public TreeBaseItemRelation BuildTree(Guid referenceItemId,
-                                              bool includeParentsAndChildren = false,
-                                              bool excludeChildrenFromParents = false)
+        public TreeBaseItemRelation TreeBuilder(TreeBuilderOptions treeBuilderOptions)
         {
-            TreeBaseItemRelation rootItem = _baseItemRepository.GetItemRelationTree(referenceItemId);
+            TreeBuilderReference treeBuilderReference = new TreeBuilderReference();
+            TreeBaseItemRelation referenceItem = new TreeBaseItemRelation();
 
-            return BuildTreeRecursive(rootItem, includeParentsAndChildren, excludeChildrenFromParents);
+            treeBuilderReference.ReferenceItemId = treeBuilderOptions.ReferenceItemId;
+            treeBuilderReference.includeAllAscendentChildren = treeBuilderOptions.includeAllAscendentChildren;
+
+            //Monta arvore completa desde o pai Original
+            if (treeBuilderOptions.buildAscendentTree)
+            {
+                treeBuilderReference.OriginalParentId = treeBuilderOptions.ReferenceItemId;
+                treeBuilderReference = SearchOriginalParentRecursive(treeBuilderReference);
+
+                //Recupero o item completo  do id do pai original. Ele será o ponto zero da montagem da arvore
+                referenceItem = _baseItemRepository.GetItemRelationTree(treeBuilderReference.OriginalParentId);
+            }
+            else
+            {
+                //Recupero o item completo do id informado. Ele será o ponto zero da montagem da arvore
+                referenceItem = _baseItemRepository.GetItemRelationTree(treeBuilderOptions.ReferenceItemId);
+            }
+
+            TreeBaseItemRelation completeTree = new TreeBaseItemRelation();
+
+            completeTree = BuildTreeRecursive(referenceItem, treeBuilderReference);
+
+            return completeTree;
         }
 
-        private TreeBaseItemRelation BuildTreeRecursive(TreeBaseItemRelation currentItem, bool includeParentsAndChildren, bool excludeChildrenFromParents)
+        private TreeBuilderReference SearchOriginalParentRecursive(TreeBuilderReference treeBuilderReference)
+        {
+            //-----------------------------------------------------------------------------------
+            // Esta rotina recursiva realiza uma busca inversa de Parents, a patir do item
+            // de referencia, até encontrar o pai original da estrutura
+            //------------------------------------------------------------------------------------
+
+            Guid currentParentId = _baseItemRepository.GetParentOf(treeBuilderReference.OriginalParentId);
+
+            if (currentParentId == Guid.Empty)
+            {
+                treeBuilderReference.OriginalParentId = treeBuilderReference.OriginalParentId;
+                treeBuilderReference.Parents.Add(currentParentId);
+                return treeBuilderReference;
+            }
+            else
+            {
+                treeBuilderReference.OriginalParentId = currentParentId;
+                treeBuilderReference.Parents.Add(currentParentId);
+                return SearchOriginalParentRecursive(treeBuilderReference);
+            }
+        }
+
+        private TreeBaseItemRelation BuildTreeRecursive(TreeBaseItemRelation currentItem, TreeBuilderReference treeBuilderReference)
         {
             if (currentItem == null)
                 return null;
@@ -110,27 +154,28 @@ namespace WorkTree.Business
                 Children = currentItem.Children
             };
 
-            //if (includeParentsAndChildren){
-                
-                if (currentItem.ParentId.HasValue)
-                {
-                    TreeBaseItemRelation parentItem = _baseItemRepository.GetItemRelationTree(currentItem.ParentId.Value);
-                    clonedItem.Parent = BuildTreeRecursive(parentItem, true, excludeChildrenFromParents);
-                }
+            var children = _baseItemRepository.GetItemRelationTreeChildren(currentItem.Id);
+            foreach (var child in children)
+            {
+                //Sao condicoes para incluir um ramo filho
+                // 01 Inclusao de todos os filhos dos ascentes marcada como true
+                // 02 O filho encontrado constar na lista de parentes ascendentes
+                // 03 O filho encontrado é o item de referencia
+                // 04 O filho encontrado tem pai o item de referencia
 
-                //if (excludeChildrenFromParents){
-                    
-                    var children = _baseItemRepository.GetItemRelationTreeChildren(currentItem.Id);
-                    foreach (var child in children)
-                    {
-                        clonedItem.Children.Add(BuildTreeRecursive(child, true, false));
-                    }
-                //}
-            //}
+                if (treeBuilderReference.includeAllAscendentChildren ||
+                    treeBuilderReference.Parents.Contains(child.Id) ||
+                    child.Id == treeBuilderReference.ReferenceItemId ||
+                    child.ParentId == treeBuilderReference.ReferenceItemId
+                    )
+                {
+                    clonedItem.Children.Add(BuildTreeRecursive(child, treeBuilderReference));
+                }
+            }
 
             return clonedItem;
         }
-
-        #endregion Build Tree
     }
+
+    #endregion Build Tree
 }

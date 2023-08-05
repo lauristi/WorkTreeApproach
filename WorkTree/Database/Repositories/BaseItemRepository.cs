@@ -245,22 +245,20 @@ namespace WorkTree.Repositories
 
             TreeBaseItemRelation baseItemTree = new TreeBaseItemRelation();
 
-            if (result == null)
+            if (result != null)
             {
-                return baseItemTree;
+                baseItemTree.Id = result.Id;
+                baseItemTree.ParentId = result.ParentId;
+                baseItemTree.Name = result.Name;
+                baseItemTree.Image = result.Image;
+                baseItemTree.ItemTypeId = result.ItemTypeId;
+                baseItemTree.StartDate = result.StartDate;
+                baseItemTree.EndDate = result.EndDate;
+                baseItemTree.ItemStatusId = result.ItemStatusId;
+                baseItemTree.OwnerTypeId = result.OwnerTypeId;
+                baseItemTree.OwnerId = result.OwnerId;
+                baseItemTree.ItemOrder = result.ItemOrder;
             }
-
-            baseItemTree.Id = result.Id;
-            baseItemTree.ParentId = result.ParentId;
-            baseItemTree.Name = result.Name;
-            baseItemTree.Image = result.Image;
-            baseItemTree.ItemTypeId = result.ItemTypeId;
-            baseItemTree.StartDate = result.StartDate;
-            baseItemTree.EndDate = result.EndDate;
-            baseItemTree.ItemStatusId = result.ItemStatusId;
-            baseItemTree.OwnerTypeId = result.OwnerTypeId;
-            baseItemTree.OwnerId = result.OwnerId;
-            baseItemTree.ItemOrder = result.ItemOrder;
 
             return baseItemTree;
         }
@@ -308,6 +306,28 @@ namespace WorkTree.Repositories
             }
 
             return children;
+        }
+
+        public Guid GetParentOf(Guid id)
+        {
+            using IDbConnection connection = new SqlConnection(connectionString);
+
+            string sql = @"SELECT ParentId
+                             FROM BASEITEMRELATION
+                            WHERE Id = @Id";
+            //--------------------------------------------------------------------------------
+            var result = connection.QuerySingleOrDefault(sql, new { Id = id });
+
+            TreeBaseItemRelation baseItemTree = new TreeBaseItemRelation();
+
+            if (result.ParentId == null)
+            {
+                return Guid.Empty;
+            }
+            else
+            {
+                return result.ParentId;
+            }
         }
 
         #endregion ItemRelationTree

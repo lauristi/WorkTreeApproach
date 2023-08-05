@@ -18,8 +18,9 @@ namespace WorkTree.AutoMapper
             CreateMap<BaseItemRelation, BaseItemRelationResponseDTO>().ReverseMap();
             CreateMap<BaseItemRelation, BaseItemRelationRequestDTO>().ReverseMap();
 
-            //Base Item Tree
+            //Tree
             CreateMap<TreeBaseItemRelation, TreeBaseItemRelationResponseDTO>().ReverseMap();
+            CreateMap<TreeBuilderOptions, TreeBuilderOptionsRequestDTO>().ReverseMap();
 
             //Types
             CreateMap<ItemStatus, ItemStatusResponseDTO>().ReverseMap();
