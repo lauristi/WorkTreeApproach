@@ -101,8 +101,8 @@ Item: 30
 └── Item: 500
 ```
 
-### Diagramado banco 
-![Diagrama](URL_da_Imagem)
+### Diagrama do banco 
+![Diagrama](Diagrama.png)
 
 
 
