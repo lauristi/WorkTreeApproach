@@ -85,10 +85,10 @@ namespace WorkTree.Business
             TreeBaseItemRelation referenceItem = new TreeBaseItemRelation();
 
             treeBuilderReference.ReferenceItemId = treeBuilderOptions.ReferenceItemId;
-            treeBuilderReference.includeAllAscendentChildren = treeBuilderOptions.includeAllAscendentChildren;
+            treeBuilderReference.includeAllAscendentChildren = treeBuilderOptions.IncludeAllAscendentChildren;
 
             //Monta arvore completa desde o pai Original
-            if (treeBuilderOptions.buildAscendentTree)
+            if (treeBuilderOptions.BuildAscendentTree)
             {
                 treeBuilderReference.OriginalParentId = treeBuilderOptions.ReferenceItemId;
                 treeBuilderReference = SearchOriginalParentRecursive(treeBuilderReference);

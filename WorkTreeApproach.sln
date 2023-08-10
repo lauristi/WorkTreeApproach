@@ -3,7 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.33906.173
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkTree", "WorkTree\WorkTree.csproj", "{5920C892-C7A9-4C41-BB8D-1062B97E1D65}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkTree", "WorkTree\WorkTree.csproj", "{5920C892-C7A9-4C41-BB8D-1062B97E1D65}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WorkTreeTest", "WorkTreeTest\WorkTreeTest.csproj", "{5BE5F36F-E912-4ADC-B25E-59BA53061282}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "readme", "readme", "{48C75742-9A7A-4ED0-8E1F-55ED60E887C7}"
+	ProjectSection(SolutionItems) = preProject
+		C:\Users\sysdba\Desktop\Diagrama.png = C:\Users\sysdba\Desktop\Diagrama.png
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +22,10 @@ Global
 		{5920C892-C7A9-4C41-BB8D-1062B97E1D65}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5920C892-C7A9-4C41-BB8D-1062B97E1D65}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5920C892-C7A9-4C41-BB8D-1062B97E1D65}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5BE5F36F-E912-4ADC-B25E-59BA53061282}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5BE5F36F-E912-4ADC-B25E-59BA53061282}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5BE5F36F-E912-4ADC-B25E-59BA53061282}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5BE5F36F-E912-4ADC-B25E-59BA53061282}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
