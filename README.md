@@ -39,7 +39,8 @@ Para efeitos de estudo foi feita a opção pela simplificação da estrutra.
    na performace
 2- Alteração de Id de um item quando ele se torna um item de uma arvore, não impede rastreamento, mas
    requer atenção por parte do programador.   
-
+3- Replicação de algum dados, mas esta abordagem permite alterar um item quase completamente 
+   dependendo a arvore onde se encontra.
 
 ### Particularidades da codificação
 
@@ -100,3 +101,15 @@ Item: 30
 ├── Item: 400
 └── Item: 500
 ```
+
+### Diagrama do banco 
+![Diagrama](Diagrama.png)
+
+
+
+
+
+
+
+
+
