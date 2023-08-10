@@ -7,7 +7,7 @@ namespace WorkTree.Business
 {
     public class BaseItemBLL : IBaseItemBLL
     {
-        #region Item
+        #region Item CRUD
 
         private readonly IBaseItemRepository _baseItemRepository;
 
@@ -43,7 +43,7 @@ namespace WorkTree.Business
 
         #endregion Item
 
-        #region ItemRelation
+        #region ItemRelation CRUD
 
         public Task<IEnumerable<BaseItemRelation>> GetAllItemRelation(Guid id)
         {
@@ -134,9 +134,6 @@ namespace WorkTree.Business
 
         private TreeBaseItemRelation BuildTreeRecursive(TreeBaseItemRelation currentItem, TreeBuilderReference treeBuilderReference)
         {
-            if (currentItem == null)
-                return null;
-
             TreeBaseItemRelation clonedItem = new TreeBaseItemRelation
             {
                 Id = currentItem.Id,

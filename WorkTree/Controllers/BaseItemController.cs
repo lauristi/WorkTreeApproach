@@ -192,7 +192,7 @@ namespace WorkTree.Controllers
         #region BaseRelationTree
 
         [HttpPost, Route("/workTree")]
-        public ActionResult<TreeBaseItemRelationResponseDTO> BaseItemRelationTreeBuild(TreeBuilderOptionsRequestDTO treeBuilderOptionsRequestDTO)
+        public ActionResult<TreeBaseItemRelationResponseDTO> TreeBuilder(TreeBuilderOptionsRequestDTO treeBuilderOptionsRequestDTO)
         {
             var treeBuilderOptions = _mapper.Map<TreeBuilderOptions>(treeBuilderOptionsRequestDTO);
 

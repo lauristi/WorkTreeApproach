@@ -35,7 +35,7 @@ namespace WorkTree.Tests
         }
 
         [Fact]
-        public void TreeBuildShouldReturnTreeBaseItemRelationResponseDTO()
+        public void TreeBuilderShouldReturnTreeBaseItemRelationResponseDTO()
         {
             #region Arrange
 
@@ -103,7 +103,7 @@ namespace WorkTree.Tests
 
             #region Act
 
-            var result = _controller.BaseItemRelationTreeBuild(treeBuilderOptionsRequestDTO);
+            var result = _controller.TreeBuilder(treeBuilderOptionsRequestDTO);
 
             #endregion Act
 
