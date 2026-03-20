@@ -1,58 +1,47 @@
-# Projeto de estudo para criação de árvore hierárquica
+# Estudo de Estruturas Hierárquicas e Árvores Recursivas
 
+Este repositório contém um projeto de estudo focado na implementação e otimização de estruturas de dados hierárquicas. O objetivo principal é explorar a transição de um modelo de dados fragmentado para uma abordagem unificada e eficiente.
 
-### Contexto
+---
 
-A Aplicação original era destinada a um software de OKR.
-A analise original determinou tabelas separadas por item. 
-Sendo os itens: ActionPlan, Objetive, Task, ItemTask
+## 1. Contexto do Projeto
 
-Cada tabela com tabelas de apoio para árvore sendo tabelas Parent e Child
-gerando um total de  doze (12) tabelas para a montagem da árvore.
+Originalmente, a arquitetura foi concebida para um software de **OKR (Objectives and Key Results)**. Na análise inicial, a estrutura era composta por quatro entidades distintas: `ActionPlan`, `Objective`, `Task` e `ItemTask`. Para suportar a árvore de relações entre esses itens, eram necessárias doze tabelas, incluindo tabelas de apoio para o mapeamento de *Parent* (Pai) e *Child* (Filho).
 
-### Requistos da estrutura
-1- Permitir a construção da arvore à partir de qualquer item dela.
-2- Permitir a construção tanto de ascendentes, quanto de descendentes à partir do item escolhido
-3- Permitir escolher entre a montagem dos ascendentes com todos os filhos
-   ou somente com filhos referentes ao item escolhido como inicial
-4- Permitir que itens fossem reaproveitados em outras árvores
-5- Permitir  um controle de visualização por usuario (Owner) ou grupo de usuários (TypeOwner)
-6- Permitir o controle individual do status de andamento de cada item
+## 2. Requisitos de Estrutura
 
-### O que foi percebido
+A implementação visa atender aos seguintes critérios técnicos:
+* **Navegação Bidirecional:** Construção da árvore a partir de qualquer nó (item) escolhido.
+* **Flexibilidade de Traversal:** Capacidade de renderizar tanto ascendentes quanto descendentes a partir do ponto de entrada.
+* **Filtros de Contexto:** Opção de montar ascendentes exibindo todos os nós adjacentes ou apenas o caminho direto ao item inicial.
+* **Reuso de Componentes:** Possibilidade de reutilizar o mesmo item em múltiplas árvores distintas.
+* **Gestão de Acesso e Status:** Estrutura preparada para controle de visibilidade por `Owner` (usuário) ou `TypeOwner` (grupo), além de monitoramento individual de progresso.
 
-A estrutura original: ActionPlan, Objetive, Task, ItemTask apesar de separada era composta
-de itens com estruturas gêmeas.
+## 3. Evolução da Arquitetura
 
-Para efeitos de estudo foi feita a opção pela simplificação da estrutra.
+### Proposta de Simplificação
+A estrutura original apresentava entidades com propriedades análogas ("estruturas gêmeas"). Por este motivo, optou-se pela unificação das entidades em uma única estrutura genérica denominada **Item**.
 
-#### Prós
+#### Vantagens (Prós)
+* **Redução de Complexidade:** A manutenção é centralizada em apenas duas tabelas principais, em vez de doze.
+* **Escalabilidade:** Permite a expansão infinita para novos tipos de itens sem necessidade de alterações no esquema do banco de dados.
+* **Padronização:** Unificação de controles de status e permissões para todos os níveis da hierarquia.
 
-1- Simplificação da estrutura, facilitando a manutenção, exitiria apenas uma estrutura; Item
-2- Redução do número de tabelas de doze(12) para duas(2) sem contar tabelas de apoio
-2- Expansão infinita de novos itens
-3- Controles como status, usuarios e outros poderiam ser unificados atendendo a qualquer item
+#### Considerações (Contras)
+* **Performance:** A consolidação resulta em tabelas com maior volume de dados, exigindo estratégias de indexação otimizadas.
+* **Gestão de Identidade:** Requer atenção rigorosa na gestão de IDs ao associar itens a diferentes contextos de árvore.
+* **Redundância Controlada:** Eventual replicação de dados para permitir que um item seja alterado quase completamente dependendo da árvore onde se encontra.
 
-#### Contras
+## 4. Detalhes de Implementação
 
-1- Simplificação redução das tabelas implica em tabalhar com tabelas maiores podendo ocorrer impacto
-   na performace
-2- Alteração de Id de um item quando ele se torna um item de uma arvore, não impede rastreamento, mas
-   requer atenção por parte do programador.   
-3- Replicação de algum dados, mas esta abordagem permite alterar um item quase completamente 
-   dependendo a arvore onde se encontra.
+* **Lógica de Negócio:** Utilização de funções recursivas para a montagem da árvore, visando a modularização e redução de código duplicado.
+* **Acesso a Dados:** Implementação realizada com **Dapper**, priorizando performance e controle direto sobre as consultas SQL (sem utilização de ORMs pesados).
+* **Tratamento de Exceções:** A camada de erro foi omitida propositalmente para permitir que a lógica de montagem seja adaptada conforme a necessidade da aplicação consumidora.
+* **Qualidade:** Inclusão de teste unitário básico para validação do endpoint de construção da hierarquia.
 
-### Particularidades da codificação
+## 5. Exemplos de Visualização
 
-1- Optou-se pela utilização de função recursiva, tanto quanto possível para redução de código
-2- Estruturas de controle de usuário e status estão presentes mas não foram implementadas
-3- Estruturas de controle de erro não foram implementadas, pois podem variar de acordo com o código onde
-   as rotinas de montagem de arvore for implementada.
-4- Foi usado Dapper puro sem nenhum framework de acesso à dados como Hibernate ou Entity
-5- Foi montando apenas um teste unitário simples do endpoint de montagem da arvore
-
-
-### Exemplos da montagem da arvore
+Abaixo, exemplos de como a lógica de travessia se comporta conforme os parâmetros:
 
 #### ARVORE COMPLETA
 ```
