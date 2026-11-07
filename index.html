@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estrutura Hierárquica e Árvores Recursivas - OKR Engenharia</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- D3.js v7 CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  <!-- Google Fonts Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#f0fdfa',
+              500: '#14b8a6',
+              600: '#0d9488',
+              700: '#0f766e',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Estilos dos links e nós D3 */
+    .link-path {
+      fill: none;
+      stroke: #334155;
+      stroke-width: 2px;
+      transition: stroke 0.3s ease, stroke-width 0.3s ease, stroke-opacity 0.3s ease;
+    }
+    .link-path.highlighted {
+      stroke: #38bdf8;
+      stroke-width: 3.5px;
+      stroke-opacity: 1;
+    }
+    .link-path.dimmed {
+      stroke-opacity: 0.15;
+    }
+    .node-group {
+      cursor: pointer;
+    }
+    .node-card {
+      transition: filter 0.25s ease, transform 0.25s ease, opacity 0.3s ease;
+    }
+    .node-group:hover .node-card {
+      filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.45));
+    }
+    .node-group.dimmed {
+      opacity: 0.2;
+    }
+    .node-group.selected .node-card {
+      stroke: #38bdf8 !important;
+      stroke-width: 2.5px !important;
+      filter: drop-shadow(0 0 16px rgba(56, 189, 248, 0.7));
+    }
+    /* Scrollbar sutil */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans overflow-hidden antialiased selection:bg-cyan-500 selection:text-white">
+
+  <!-- BARRA DE NAVEGAÇÃO SUPERIOR -->
+  <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 px-5 py-3 flex flex-wrap items-center justify-between gap-4 z-20 shrink-0">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-gradient-to-tr from-cyan-600 to-teal-400 flex items-center justify-center shadow-lg shadow-cyan-500/20 text-white font-bold text-lg">
+        Ω
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-sm md:text-base font-semibold text-slate-100 tracking-tight">OKR Hierarchical Engine</h1>
+          <span class="px-2 py-0.5 text-[10px] font-mono tracking-wide uppercase bg-cyan-950/80 text-cyan-400 border border-cyan-800/60 rounded-full font-medium">PoC 2019-2026</span>
+        </div>
+        <p class="text-xs text-slate-400 hidden sm:block">Prova de conceito: BaseItem + BaseItemRelation em Engenharia Civil</p>
+      </div>
+    </div>
+
+    <!-- BOTÕES DE MODO E AÇÃO -->
+    <div class="flex items-center gap-2">
+      <div class="bg-slate-800/80 p-1 rounded-lg border border-slate-700/60 flex items-center text-xs">
+        <button id="btnModeAll" class="px-3 py-1.5 rounded-md font-medium transition bg-cyan-600 text-white shadow-sm" onclick="setViewMode('all')">
+          Árvore Completa
+        </button>
+        <button id="btnModeFocus" class="px-3 py-1.5 rounded-md font-medium text-slate-400 hover:text-slate-200 transition" onclick="setViewMode('focus')">
+          Destacar Ramo
+        </button>
+      </div>
+
+      <button onclick="resetZoom()" title="Centralizar e Redefinir Zoom" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 rounded-lg text-xs transition flex items-center gap-1.5">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+        <span class="hidden md:inline">Resetar Zoom</span>
+      </button>
+
+      <button onclick="toggleDetailsModal()" class="md:hidden p-2 bg-slate-800 border border-slate-700 text-slate-300 rounded-lg text-xs">
+        Detalhes
+      </button>
+    </div>
+  </header>
+
+  <!-- ÁREA DE TRABALHO PRINCIPAL -->
+  <main class="flex-1 relative flex overflow-hidden">
+    
+    <!-- ÁREA DO CANVAS SVG (D3.JS) -->
+    <div class="flex-1 relative h-full w-full bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:24px_24px]">
+      
+      <!-- LEGENDA RÁPIDA SUPERIOR ESQUERDA -->
+      <div class="absolute top-4 left-4 z-10 bg-slate-900/80 backdrop-blur-md border border-slate-800 rounded-xl p-3 shadow-xl max-w-xs text-xs pointer-events-auto">
+        <div class="text-[11px] font-semibold text-slate-300 uppercase tracking-wider mb-2 flex items-center justify-between">
+          <span>Legenda de Tipos</span>
+          <span class="text-slate-500 font-normal">Níveis</span>
+        </div>
+        <div class="grid grid-cols-1 gap-1.5">
+          <div class="flex items-center gap-2 text-slate-300">
+            <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
+            <span>Objetivo Estratégico (OKR)</span>
+          </div>
+          <div class="flex items-center gap-2 text-slate-300">
+            <span class="w-2.5 h-2.5 rounded-full bg-indigo-400"></span>
+            <span>Resultado-Chave (KR)</span>
+          </div>
+          <div class="flex items-center gap-2 text-slate-300">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+            <span>Frente / Plano de Ação</span>
+          </div>
+          <div class="flex items-center gap-2 text-slate-300">
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+            <span>Pacote / Tarefa Executiva</span>
+          </div>
+          <div class="flex items-center gap-2 text-slate-300">
+            <span class="w-2.5 h-2.5 rounded-full bg-pink-400"></span>
+            <span class="flex items-center gap-1">Inspeção / Ensaio <span class="text-[10px] text-pink-300 font-mono">(Reuso)</span></span>
+          </div>
+        </div>
+        <div class="mt-2.5 pt-2 border-t border-slate-800 text-[11px] text-slate-400 leading-tight">
+          💡 <span class="text-slate-300">Dica:</span> Use o scroll do mouse para Zoom, arraste para navegar e clique em qualquer nó.
+        </div>
+      </div>
+
+      <!-- CONTAINER SVG D3 -->
+      <svg id="treeCanvas" class="w-full h-full block cursor-grab active:cursor-grabbing"></svg>
+
+      <!-- INDICADOR DO ITEM COMPARTILHADO (DAG) -->
+      <div id="sharedNotice" class="hidden absolute bottom-4 left-4 z-10 bg-amber-950/80 backdrop-blur-md border border-amber-600/50 rounded-xl p-3 shadow-xl max-w-md text-xs text-amber-200">
+        <div class="flex items-start gap-2.5">
+          <span class="text-base">🔗</span>
+          <div>
+            <div class="font-semibold text-amber-100 mb-0.5">Item Reutilizado do Catálogo (DAG)</div>
+            <p class="text-amber-200/90 text-[11px] leading-relaxed">
+              O mesmo item mestre (<code class="bg-amber-900/60 px-1 py-0.5 rounded font-mono text-[10px]">Item_Shared_Ensaio</code>) está instanciado simultaneamente na frente de <strong>Fundações</strong> e na de <strong>Pavimentos</strong>, mantendo cronogramas e status independentes.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAINEL LATERAL DE DETALHES DO NÓ -->
+    <aside id="detailsPanel" class="w-80 md:w-96 bg-slate-900/95 backdrop-blur-xl border-l border-slate-800 p-5 flex flex-col justify-between shrink-0 z-20 shadow-2xl transition-all duration-300 transform translate-x-full md:translate-x-0 absolute md:static inset-y-0 right-0">
+      
+      <div class="space-y-5 overflow-y-auto pr-1">
+        <!-- Topo do Painel -->
+        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-mono font-semibold uppercase tracking-wider text-cyan-400">Contexto do Nó</span>
+          </div>
+          <button onclick="toggleDetailsModal()" class="md:hidden text-slate-400 hover:text-white">
+            ✕
+          </button>
+        </div>
+
+        <!-- Cabeçalho do Item Selecionado -->
+        <div>
+          <div class="flex items-center gap-2 mb-1.5 flex-wrap">
+            <span id="detailBadgeType" class="px-2.5 py-0.5 text-[11px] font-semibold rounded-full bg-cyan-950 border border-cyan-800 text-cyan-300">
+              Tipo do Nó
+            </span>
+            <span id="detailBadgeStatus" class="px-2.5 py-0.5 text-[11px] font-semibold rounded-full bg-emerald-950 border border-emerald-800 text-emerald-300">
+              Status
+            </span>
+          </div>
+          <h2 id="detailTitle" class="text-base font-bold text-white tracking-tight leading-snug">
+            Selecione um nó no gráfico
+          </h2>
+          <p id="detailSubtitle" class="text-xs text-slate-400 mt-1">
+            Clique em qualquer caixa da árvore para inspecionar os atributos relacionais e de catálogo.
+          </p>
+        </div>
+
+        <!-- Destaque de Item Compartilhado -->
+        <div id="detailSharedTag" class="hidden p-3 rounded-lg bg-pink-950/40 border border-pink-700/50 text-pink-200 text-xs">
+          <div class="font-semibold flex items-center gap-1.5 text-pink-300 mb-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+            Reuso de Catálogo (BaseItem)
+          </div>
+          <p class="text-[11px] text-pink-200/80 leading-relaxed">
+            Este nó referencia um registro mestre já existente, viabilizando métricas globais sem duplicar cadastros de biblioteca.
+          </p>
+        </div>
+
+        <!-- Propriedades Técnicas (Campos da Tabela) -->
+        <div class="space-y-3 pt-2">
+          <div class="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-semibold">Propriedades Relacionais</div>
+          
+          <div class="bg-slate-950/60 rounded-lg p-3 border border-slate-800/80 space-y-2 text-xs">
+            <div class="flex justify-between items-center">
+              <span class="text-slate-400">Responsável (Owner):</span>
+              <span id="detailOwner" class="font-medium text-slate-200 text-right">-</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-slate-400">Perfil (OwnerType):</span>
+              <span id="detailOwnerType" class="font-medium text-slate-200 text-right">-</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-slate-400">Data de Início:</span>
+              <span id="detailStartDate" class="font-mono text-slate-200">-</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-slate-400">Data de Conclusão:</span>
+              <span id="detailEndDate" class="font-mono text-slate-200">-</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-slate-400">Ordem Relativa:</span>
+              <span id="detailOrder" class="font-mono text-slate-200">-</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Identificadores GUID e Estrutura -->
+        <div class="space-y-2">
+          <div class="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-semibold">Chaves e Identidade</div>
+          <div class="bg-slate-950/60 rounded-lg p-3 border border-slate-800/80 space-y-2 font-mono text-[10px]">
+            <div>
+              <div class="text-slate-500 mb-0.5">BaseItemRelation.Id:</div>
+              <div id="detailRelId" class="text-cyan-300 break-all bg-slate-900 px-2 py-1 rounded">-</div>
+            </div>
+            <div>
+              <div class="text-slate-500 mb-0.5">ParentId (Vínculo Pai):</div>
+              <div id="detailParentId" class="text-slate-300 break-all bg-slate-900 px-2 py-1 rounded">-</div>
+            </div>
+            <div>
+              <div class="text-slate-500 mb-0.5">BaseItemId (Catálogo):</div>
+              <div id="detailBaseId" class="text-indigo-300 break-all bg-slate-900 px-2 py-1 rounded">-</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Rodapé do Painel -->
+      <div class="pt-4 mt-4 border-t border-slate-800 text-center">
+        <span class="text-[11px] text-slate-500">Arquitetura de Dados Unificada • Dapper / SQL</span>
+      </div>
+
+    </aside>
+
+  </main>
+
+  <!-- LÓGICA DE DADOS E VISUALIZAÇÃO COM D3.JS -->
+  <script>
+    // 1. CONJUNTO DE DADOS BASEADO FIELMENTE NO SCRIPT SQL
+    const rawHierarchyData = {
+      id: "B0000000-0000-0000-0000-000000000001",
+      baseItemId: "A0000000-0000-0000-0000-000000000001",
+      parentId: null,
+      name: "Objetivo Geral da Obra",
+      fullName: "Entregar Estrutura de Concreto Armado do Edifício Residencial",
+      type: "Objetivo Estratégico (OKR)",
+      typeCode: "OBJ",
+      status: "Em Execução",
+      ownerType: "Engenheiro Residente",
+      owner: "Eng. Coordenador de Obras",
+      startDate: "2026-01-10",
+      endDate: "2026-12-20",
+      itemOrder: 1,
+      isShared: false,
+      children: [
+        {
+          id: "B0000000-0000-0000-0000-000000000002",
+          baseItemId: "A0000000-0000-0000-0000-000000000002",
+          parentId: "B0000000-0000-0000-0000-000000000001",
+          name: "KR 01 - Fundações Concluídas",
+          fullName: "Concluir 100% da Fundação Profunda e Blocos de Coroamento",
+          type: "Resultado-Chave (KR)",
+          typeCode: "KR",
+          status: "Concluído",
+          ownerType: "Engenheiro Residente",
+          owner: "Eng. Coordenador de Obras",
+          startDate: "2026-01-15",
+          endDate: "2026-04-30",
+          itemOrder: 1,
+          isShared: false,
+          children: [
+            {
+              id: "B0000000-0000-0000-0000-000000000004",
+              baseItemId: "A0000000-0000-0000-0000-000000000004",
+              parentId: "B0000000-0000-0000-0000-000000000002",
+              name: "Frente de Infraestrutura",
+              fullName: "Frente de Infraestrutura e Fundações",
+              type: "Plano de Ação / Frente",
+              typeCode: "ACT",
+              status: "Concluído",
+              ownerType: "Mestre de Obras",
+              owner: "Mestre Sebastião Rocha",
+              startDate: "2026-01-20",
+              endDate: "2026-04-15",
+              itemOrder: 1,
+              isShared: false,
+              children: [
+                {
+                  id: "B0000000-0000-0000-0000-000000000006",
+                  baseItemId: "A0000000-0000-0000-0000-000000000006",
+                  parentId: "B0000000-0000-0000-0000-000000000004",
+                  name: "Concretagem dos Blocos",
+                  fullName: "Concretagem dos Blocos de Fundação",
+                  type: "Pacote de Trabalho / Tarefa",
+                  typeCode: "TSK",
+                  status: "Concluído",
+                  ownerType: "Mestre de Obras",
+                  owner: "Mestre Sebastião Rocha",
+                  startDate: "2026-02-01",
+                  endDate: "2026-03-10",
+                  itemOrder: 1,
+                  isShared: false,
+                  children: [
+                    {
+                      id: "B0000000-0000-0000-0000-000000000010",
+                      baseItemId: "A0000000-0000-0000-0000-000000000099", // Item compartilhado no catalogo
+                      parentId: "B0000000-0000-0000-0000-000000000006",
+                      name: "Rompimento CP - Blocos",
+                      fullName: "Controle Tecnológico e Ensaio de Rompimento de CP (Blocos - 28 dias)",
+                      type: "Inspeção / Ensaio Técnico",
+                      typeCode: "SUB",
+                      status: "Concluído",
+                      ownerType: "Laboratório de Controle",
+                      owner: "Laboratório Falcão Bauer / TestEng",
+                      startDate: "2026-02-05",
+                      endDate: "2026-03-05",
+                      itemOrder: 1,
+                      isShared: true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          id: "B0000000-0000-0000-0000-000000000003",
+          baseItemId: "A0000000-0000-0000-0000-000000000003",
+          parentId: "B0000000-0000-0000-0000-000000000001",
+          name: "KR 02 - Pavimentos Concretados",
+          fullName: "Executar Ciclo de Concretagem das Lajes Tipo (1 a 12)",
+          type: "Resultado-Chave (KR)",
+          typeCode: "KR",
+          status: "Em Execução",
+          ownerType: "Engenheiro Residente",
+          owner: "Eng. Coordenador de Obras",
+          startDate: "2026-05-01",
+          endDate: "2026-11-30",
+          itemOrder: 2,
+          isShared: false,
+          children: [
+            {
+              id: "B0000000-0000-0000-0000-000000000005",
+              baseItemId: "A0000000-0000-0000-0000-000000000005",
+              parentId: "B0000000-0000-0000-0000-000000000003",
+              name: "Frente de Lajes e Pilares",
+              fullName: "Frente de Superestrutura e Pavimentos-Tipo",
+              type: "Plano de Ação / Frente",
+              typeCode: "ACT",
+              status: "Em Execução",
+              ownerType: "Mestre de Obras",
+              owner: "Mestre Sebastião Rocha",
+              startDate: "2026-05-01",
+              endDate: "2026-11-15",
+              itemOrder: 1,
+              isShared: false,
+              children: [
+                {
+                  id: "B0000000-0000-0000-0000-000000000007",
+                  baseItemId: "A0000000-0000-0000-0000-000000000007",
+                  parentId: "B0000000-0000-0000-0000-000000000005",
+                  name: "Concretagem Laje Pav. 1",
+                  fullName: "Armação e Concretagem da Laje do 1º Pavimento",
+                  type: "Pacote de Trabalho / Tarefa",
+                  typeCode: "TSK",
+                  status: "Em Execução",
+                  ownerType: "Mestre de Obras",
+                  owner: "Mestre Sebastião Rocha",
+                  startDate: "2026-05-10",
+                  endDate: "2026-05-25",
+                  itemOrder: 1,
+                  isShared: false,
+                  children: [
+                    {
+                      id: "B0000000-0000-0000-0000-000000000020",
+                      baseItemId: "A0000000-0000-0000-0000-000000000099", // Mesmo BaseItemId reutilizado!
+                      parentId: "B0000000-0000-0000-0000-000000000007",
+                      name: "Rompimento CP - Laje",
+                      fullName: "Controle Tecnológico e Ensaio de Rompimento de CP (Laje - 7/28 dias)",
+                      type: "Inspeção / Ensaio Técnico",
+                      typeCode: "SUB",
+                      status: "Aguardando Ensaio",
+                      ownerType: "Laboratório de Controle",
+                      owner: "Laboratório Falcão Bauer / TestEng",
+                      startDate: "2026-05-15",
+                      endDate: "2026-06-12",
+                      itemOrder: 1,
+                      isShared: true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    };
+
+    // Cores por tipo de nó
+    const typeColors = {
+      OBJ: { stroke: "#38bdf8", fill: "#0369a1", bg: "#082f49", text: "#e0f2fe" },
+      KR:  { stroke: "#818cf8", fill: "#4338ca", bg: "#1e1b4b", text: "#e0e7ff" },
+      ACT: { stroke: "#34d399", fill: "#047857", bg: "#022c22", text: "#d1fae5" },
+      TSK: { stroke: "#fbbf24", fill: "#b45309", bg: "#451a03", text: "#fef3c7" },
+      SUB: { stroke: "#f472b6", fill: "#be185d", bg: "#500724", text: "#fce7f3" }
+    };
+
+    // Cores de status
+    const statusBadges = {
+      "Concluído": "bg-emerald-950 border-emerald-700 text-emerald-300",
+      "Em Execução": "bg-cyan-950 border-cyan-700 text-cyan-300",
+      "Aguardando Ensaio": "bg-amber-950 border-amber-700 text-amber-300",
+      "Planejado": "bg-slate-900 border-slate-700 text-slate-300"
+    };
+
+    let selectedNode = null;
+    let currentMode = 'all'; // 'all' ou 'focus'
+    let svg, gMain, treeLayout, rootHierarchy, zoomBehavior;
+
+    const CARD_WIDTH = 220;
+    const CARD_HEIGHT = 80;
+
+    // 2. INICIALIZAÇÃO DO GRÁFICO D3
+    function initTreeVisualization() {
+      const container = document.getElementById("treeCanvas");
+      const width = container.clientWidth;
+      const height = container.clientHeight;
+
+      svg = d3.select("#treeCanvas");
+      svg.selectAll("*").remove(); // Limpa renderizações anteriores
+
+      // Grupo com suporte a Zoom e Pan
+      gMain = svg.append("g").attr("id", "mainTreeGroup");
+
+      zoomBehavior = d3.zoom()
+        .scaleExtent([0.3, 2.5])
+        .on("zoom", (event) => {
+          gMain.attr("transform", event.transform);
+        });
+
+      svg.call(zoomBehavior).on("dblclick.zoom", null);
+
+      // Hierarquia D3
+      rootHierarchy = d3.hierarchy(rawHierarchyData);
+
+      // Layout da árvore (orientação horizontal: root na esquerda, folhas na direita)
+      treeLayout = d3.tree()
+        .nodeSize([CARD_HEIGHT + 30, CARD_WIDTH + 80]); // Espaçamento entre nós
+
+      treeLayout(rootHierarchy);
+
+      // Desenhar links e nós
+      updateTree();
+
+      // Posiciona a câmera na raiz
+      resetZoom();
+
+      // Seleciona o primeiro nó automaticamente
+      selectNode(rootHierarchy);
+    }
+
+    // 3. RENDERIZAÇÃO E ATUALIZAÇÃO DOS ELEMENTOS SVG
+    function updateTree() {
+      // Links
+      const links = gMain.selectAll(".link-path")
+        .data(rootHierarchy.links(), d => `${d.source.data.id}->${d.target.data.id}`);
+
+      links.enter()
+        .append("path")
+        .attr("class", "link-path")
+        .merge(links)
+        .attr("d", d => {
+          // Curva Bézier cúbica horizontal elegante
+          const sourceX = d.source.y + CARD_WIDTH;
+          const sourceY = d.source.x + (CARD_HEIGHT / 2);
+          const targetX = d.target.y;
+          const targetY = d.target.x + (CARD_HEIGHT / 2);
+          const midX = (sourceX + targetX) / 2;
+          return `M ${sourceX} ${sourceY} C ${midX} ${sourceY}, ${midX} ${targetY}, ${targetX} ${targetY}`;
+        });
+
+      links.exit().remove();
+
+      // Grupos de Nós
+      const nodes = gMain.selectAll(".node-group")
+        .data(rootHierarchy.descendants(), d => d.data.id);
+
+      const nodeEnter = nodes.enter()
+        .append("g")
+        .attr("class", "node-group")
+        .attr("transform", d => `translate(${d.y}, ${d.x})`)
+        .on("click", (event, d) => {
+          event.stopPropagation();
+          selectNode(d);
+        });
+
+      // Retângulo de Fundo (Card)
+      nodeEnter.append("rect")
+        .attr("class", "node-card")
+        .attr("width", CARD_WIDTH)
+        .attr("height", CARD_HEIGHT)
+        .attr("rx", 10)
+        .attr("ry", 10)
+        .attr("fill", d => typeColors[d.data.typeCode].bg)
+        .attr("stroke", d => typeColors[d.data.typeCode].stroke)
+        .attr("stroke-width", 1.5);
+
+      // Barra vertical colorida de identificação de tipo
+      nodeEnter.append("rect")
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("width", 6)
+        .attr("height", CARD_HEIGHT)
+        .attr("rx", 3)
+        .attr("fill", d => typeColors[d.data.typeCode].stroke);
+
+      // Indicador de Reuso (Ícone de Link quando compartilhado)
+      nodeEnter.filter(d => d.data.isShared)
+        .append("circle")
+        .attr("cx", CARD_WIDTH - 12)
+        .attr("cy", 14)
+        .attr("r", 7)
+        .attr("fill", "#be185d");
+
+      nodeEnter.filter(d => d.data.isShared)
+        .append("text")
+        .attr("x", CARD_WIDTH - 12)
+        .attr("y", 17)
+        .attr("text-anchor", "middle")
+        .attr("fill", "#ffffff")
+        .attr("font-size", "9px")
+        .attr("font-weight", "bold")
+        .text("∞");
+
+      // Badge de Tipo (Texto reduzido)
+      nodeEnter.append("text")
+        .attr("x", 14)
+        .attr("y", 18)
+        .attr("fill", d => typeColors[d.data.typeCode].stroke)
+        .attr("font-size", "10px")
+        .attr("font-family", "JetBrains Mono, monospace")
+        .attr("font-weight", "600")
+        .text(d => d.data.typeCode);
+
+      // Status Badge (texto superior direito)
+      nodeEnter.append("text")
+        .attr("x", d => d.data.isShared ? CARD_WIDTH - 25 : CARD_WIDTH - 12)
+        .attr("y", 18)
+        .attr("text-anchor", "end")
+        .attr("fill", "#94a3b8")
+        .attr("font-size", "9px")
+        .text(d => d.data.status);
+
+      // Título do Nó (Nome do Item)
+      nodeEnter.append("text")
+        .attr("x", 14)
+        .attr("y", 40)
+        .attr("fill", "#f8fafc")
+        .attr("font-size", "12px")
+        .attr("font-weight", "600")
+        .text(d => {
+          return d.data.name.length > 24 ? d.data.name.substring(0, 22) + "..." : d.data.name;
+        });
+
+      // Subtítulo (Responsável e Ordem)
+      nodeEnter.append("text")
+        .attr("x", 14)
+        .attr("y", 62)
+        .attr("fill", "#94a3b8")
+        .attr("font-size", "10px")
+        .text(d => `Resp: ${d.data.ownerType.split(" ")[0]} • #${d.data.itemOrder}`);
+
+      nodes.exit().remove();
+
+      applyHighlighting();
+    }
+
+    // 4. LÓGICA DE DESTAQUE E FILTRAGEM (ASCENDENTES E DESCENDENTES)
+    function applyHighlighting() {
+      if (!selectedNode) return;
+
+      // Obtém todos os ascendentes até a raiz
+      const ancestors = new Set(selectedNode.ancestors());
+      
+      // Obtém todos os descendentes
+      const descendants = new Set(selectedNode.descendants());
+
+      // Conjunto com o ramo direto completo (ascendentes + descendentes)
+      const fullBranch = new Set([...ancestors, ...descendants]);
+
+      // Atualiza nós visuais
+      gMain.selectAll(".node-group")
+        .classed("selected", d => d === selectedNode)
+        .classed("dimmed", d => {
+          if (currentMode === 'focus') {
+            return !fullBranch.has(d);
+          }
+          return false;
+        });
+
+      // Atualiza links visuais
+      gMain.selectAll(".link-path")
+        .classed("highlighted", d => {
+          // Um link é destacado se ambos os nós pertencem à cadeia ativa
+          return (ancestors.has(d.source) && ancestors.has(d.target)) ||
+                 (descendants.has(d.source) && descendants.has(d.target));
+        })
+        .classed("dimmed", d => {
+          if (currentMode === 'focus') {
+            return !(
+              (ancestors.has(d.source) && ancestors.has(d.target)) ||
+              (descendants.has(d.source) && descendants.has(d.target))
+            );
+          }
+          return false;
+        });
+    }
+
+    // 5. SELEÇÃO DE UM NÓ E ATUALIZAÇÃO DO PAINEL LATERAL
+    function selectNode(dNode) {
+      selectedNode = dNode;
+      const data = dNode.data;
+
+      // Atualizar Textos
+      document.getElementById("detailTitle").innerText = data.fullName || data.name;
+      document.getElementById("detailSubtitle").innerText = `Identificador do Item: ${data.name}`;
+      
+      // Badges
+      const badgeType = document.getElementById("detailBadgeType");
+      badgeType.innerText = data.type;
+      badgeType.className = `px-2.5 py-0.5 text-[11px] font-semibold rounded-full border ${typeColors[data.typeCode].bg} ${typeColors[data.typeCode].text} border-${data.typeCode === 'OBJ' ? 'cyan' : 'indigo'}-700`;
+
+      const badgeStatus = document.getElementById("detailBadgeStatus");
+      badgeStatus.innerText = data.status;
+      badgeStatus.className = `px-2.5 py-0.5 text-[11px] font-semibold rounded-full border ${statusBadges[data.status] || 'bg-slate-900 border-slate-700 text-slate-300'}`;
+
+      // Responsáveis e Datas
+      document.getElementById("detailOwner").innerText = data.owner;
+      document.getElementById("detailOwnerType").innerText = data.ownerType;
+      document.getElementById("detailStartDate").innerText = data.startDate;
+      document.getElementById("detailEndDate").innerText = data.endDate;
+      document.getElementById("detailOrder").innerText = `#${data.itemOrder}`;
+
+      // GUIDs
+      document.getElementById("detailRelId").innerText = data.id;
+      document.getElementById("detailParentId").innerText = data.parentId || "NULL (Nó Raiz)";
+      document.getElementById("detailBaseId").innerText = data.baseItemId;
+
+      // Tag de Item Compartilhado
+      const sharedTag = document.getElementById("detailSharedTag");
+      const sharedNotice = document.getElementById("sharedNotice");
+      if (data.isShared) {
+        sharedTag.classList.remove("hidden");
+        sharedNotice.classList.remove("hidden");
+      } else {
+        sharedTag.classList.add("hidden");
+        sharedNotice.classList.add("hidden");
+      }
+
+      applyHighlighting();
+    }
+
+    // 6. MODOS DE VISUALIZAÇÃO
+    function setViewMode(mode) {
+      currentMode = mode;
+      
+      const btnAll = document.getElementById("btnModeAll");
+      const btnFocus = document.getElementById("btnModeFocus");
+
+      if (mode === 'all') {
+        btnAll.className = "px-3 py-1.5 rounded-md font-medium transition bg-cyan-600 text-white shadow-sm";
+        btnFocus.className = "px-3 py-1.5 rounded-md font-medium text-slate-400 hover:text-slate-200 transition";
+      } else {
+        btnFocus.className = "px-3 py-1.5 rounded-md font-medium transition bg-cyan-600 text-white shadow-sm";
+        btnAll.className = "px-3 py-1.5 rounded-md font-medium text-slate-400 hover:text-slate-200 transition";
+      }
+
+      applyHighlighting();
+    }
+
+    // 7. ZOOM E ENQUADRAMENTO AUTOMÁTICO
+    function resetZoom() {
+      const container = document.getElementById("treeCanvas");
+      const width = container.clientWidth;
+      const height = container.clientHeight;
+
+      const initialTransform = d3.zoomIdentity
+        .translate(80, (height / 2) - (CARD_HEIGHT / 2))
+        .scale(0.85);
+
+      svg.transition()
+        .duration(750)
+        .ease(d3.easeCubicOut)
+        .call(zoomBehavior.transform, initialTransform);
+    }
+
+    // Toggle para telas móveis
+    function toggleDetailsModal() {
+      const panel = document.getElementById("detailsPanel");
+      panel.classList.toggle("translate-x-full");
+    }
+
+    // Responsividade da tela ao redimensionar
+    window.addEventListener("resize", () => {
+      // Redesenha mantendo proporções
+      if (rootHierarchy) {
+        updateTree();
+      }
+    });
+
+    // Início imediato na montagem da janela
+    window.onload = function () {
+      initTreeVisualization();
+    };
+  </script>
+</body>
+</html>
