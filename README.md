@@ -2,6 +2,10 @@
 
 Este repositório contém um projeto de estudo focado na implementação e otimização de estruturas de dados hierárquicas. O objetivo principal é explorar a transição de um modelo de dados fragmentado para uma abordagem unificada e eficiente.
 
+
+Prova de conceito:
+https://lauristi.github.io/WorkTreeApproach/
+
 ---
 
 ## 1. Contexto do Projeto
